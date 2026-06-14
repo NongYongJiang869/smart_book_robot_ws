@@ -15,17 +15,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | 05 | `05_software_modules.md` | Per-module class designs, state machines, pick sequence, visual servoing P-controller, config YAMLs |
 | 06 | `06_tf_coordinate_tree.md` | Complete TF tree (`map→odom→base_footprint→base_link→sensors`), URDF snippets, calibration procedures |
 | 07 | `07_execution_plan.md` | 7-phase implementation plan (~26 days), milestones, test plans, risk list, operation commands |
+| 08 | `08_rdk_x5_gpio_peripherals.md` | RDK X5 GPIO/UART/PWM/I2C/SPI programming guide based on official samples — Hobot.GPIO API, pin table, patterns for emergency stop, collision sensor, serial communication |
 
 ## Implementation Status
 
-The design docs describe the complete system architecture. Actual implementation progress:
-
-- [x] STM32 firmware basics — motor control (PWM + TB6612), UART TX (see `chassis/ros_car_stm32/`)
+- [x] STM32 firmware — motor control (PWM + TB6612), encoder reading (TIM1/TIM4), USART2 serial output
 - [x] Robotic arm firmware — IK solver, servo control, serial protocol (see `6zrobotic_arm/source.c`)
 - [x] LiDAR SDK and ROS2 driver available (see `Lidar/`)
-- [ ] STM32 serial framed protocol (CRC, odometry packets) — not yet implemented in firmware
-- [ ] ROS2 workspace (`smart_book_robot_ws/`) — not yet created; nodes exist only in design docs
+- [x] **ROS2 custom_interfaces** — ChassisStatus.msg, RobotStatus.msg (see `RDKX5/src/custom_interfaces/`)
+- [x] **ROS2 stm32_bridge** — serial_protocol.py, odometry.py, bridge_node.py (see `RDKX5/src/stm32_bridge/`)
+- [ ] STM32 serial framed protocol (CRC, odometry packets) — STM32 固件侧尚未实现二进制帧协议, 当前为 printf 文本输出
 - [ ] OpenMV firmware (`book_detector.py`) — not yet implemented
+- [ ] ROS2 arm_controller, openmv_bridge, book_search nodes — not yet implemented
 - [ ] System integration — not yet started
 
 ## How to Use These Docs

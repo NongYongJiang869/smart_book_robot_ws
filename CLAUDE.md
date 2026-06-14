@@ -14,23 +14,31 @@ Smart Book-Finding Robot (智能寻书机器人) — an autonomous ROS2-based ro
 
 ```
 smart_book_robot_ws/
-├── design_docs/              # 7 design documents — the authoritative architecture reference
+├── RDKX5/                     # ROS2 Humble workspace — RDK X5 侧所有节点
+│   └── src/
+│       ├── custom_interfaces/  # 自定义消息 (ChassisStatus, RobotStatus)
+│       └── stm32_bridge/       # STM32 串口桥接 (serial_protocol, odometry, bridge_node)
+├── design_docs/               # 设计文档 — 权威架构参考
 │   ├── 01_project_overview.md
 │   ├── 02_hardware_architecture.md
 │   ├── 03_communication_protocols.md
 │   ├── 04_ros2_interfaces.md
 │   ├── 05_software_modules.md
 │   ├── 06_tf_coordinate_tree.md
-│   └── 07_execution_plan.md
-├── chassis/ros_car_stm32/    # STM32F103C8T6 firmware — chassis motor control
-│   ├── inc/                  # Headers (motor.h, bsp_usart.h, bsp_delay.h, etc.)
-│   ├── src/                  # Sources (main.c, motor.c, bsp_usart.c, etc.)
+│   ├── 07_execution_plan.md
+│   └── 08_rdk_x5_gpio_peripherals.md
+├── chassis/                   # STM32F103C8T6 firmware — chassis motor control
+│   ├── inc/                  # Headers (motor.h, encoder.h, bsp_usart.h, etc.)
+│   ├── src/                  # Sources (main.c, motor.c, encoder.c, bsp_usart.c, etc.)
 │   ├── startup/              # Startup assembly (startup_stm32f10x_md.s)
 │   ├── ld/                   # Linker script (stm32f103c8t6.ld)
 │   ├── stdlib/               # CMSIS + STM32F10x StdPeriph Driver
 │   ├── tools/openocd/        # OpenOCD config for flashing/debugging
 │   ├── Makefile              # arm-none-eabi-gcc build
+│   ├── README.md             # Pin assignments, timer allocation, serial output format
 │   └── .clangd               # clangd config for IDE support
+├── tools/
+│   └── chassis_serial_monitor.py  # RDK X5 串口监控程序 (接收 STM32 编码器数据)
 ├── 6zrobotic_arm/
 │   └── source.c              # Arduino firmware — 6-axis arm with IK, servo control, serial protocol
 └── Lidar/
@@ -40,7 +48,7 @@ smart_book_robot_ws/
 
 ## Build Commands
 
-### STM32 Firmware (`chassis/ros_car_stm32/`)
+### STM32 Firmware (`chassis/`)
 
 ```bash
 cd chassis/ros_car_stm32
@@ -57,7 +65,33 @@ Toolchain: `arm-none-eabi-gcc` targeting Cortex-M3 (`-mcpu=cortex-m3 -mthumb`). 
 
 This is Arduino firmware. Build and upload via Arduino IDE (board: Arduino Mega or compatible). No CLI build command — edit in Arduino IDE.
 
-### ROS2 (future — not yet implemented)
+### ROS2 (`RDKX5/`)
+
+```bash
+cd RDKX5
+source /opt/ros/humble/setup.bash
+colcon build                                          # 全量编译
+colcon build --packages-select stm32_bridge           # 只编译单个包
+rm -rf install/<pkg> build/<pkg> && colcon build      # 重新安装 (setuptools 兼容)
+```
+
+> **注意**: 当前 setuptools 版本不支持 `--uninstall` 和 `--editable`，重新编译前需手动 `rm -rf install/<pkg> build/<pkg>`。不要用 `--symlink-install`。
+
+**运行**:
+```bash
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+
+# 启动 STM32 桥接
+ros2 launch stm32_bridge stm32_bridge.launch.py
+
+# 启动底盘 + 键盘遥控
+ros2 launch stm32_bridge chassis_bringup.launch.py teleop:=true
+
+# 查看话题
+ros2 topic echo /odom
+ros2 topic echo /chassis_status
+```
 
 The ROS2 workspace path defined in docs is `smart_book_robot_ws/` (sibling to this repo's `Lidar/` directory). Build command (once implemented):
 ```bash

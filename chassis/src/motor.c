@@ -48,6 +48,9 @@ void motor_init(void)
                            RCC_APB2Periph_AFIO, ENABLE);
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
+    /* 关闭 JTAG, 保留 SWD — 释放 PB3/JTDO 给左电机 AIN1 使用 */
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+
     /* ========== 控制引脚配置 ========== */
     /* PA4 (AIN2), PA5 (BIN1), PA6 (BIN2), PA12 (STBY) */
     gpio.GPIO_Pin = MOTOR_AIN2_PIN | MOTOR_BIN1_PIN | MOTOR_BIN2_PIN | MOTOR_STBY_PIN;

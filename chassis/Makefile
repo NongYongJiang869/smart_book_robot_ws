@@ -35,6 +35,8 @@ PROJECT_C_SOURCES := \
 	src/motor.c \
 	src/bsp_delay.c \
 	src/bsp_usart.c \
+	src/encoder.c \
+	src/protocol.c \
 	src/stm32f10x_it.c \
 	src/system_stm32f10x.c
 
