@@ -1,0 +1,22 @@
+CompileFlags:
+  # 移除 clang 不认识的 GCC 专用参数，避免报 warning
+  Remove:
+    - "--specs=*"
+    - "-mthumb"
+    - "-mcpu=*"
+    - "-ffunction-sections"
+    - "-fdata-sections"
+  Add:
+    # 告诉 clang 目标是 ARM bare-metal
+    - "--target=arm-none-eabi"
+    - "-DSTM32F10X_MD"
+    - "-DUSE_STDPERIPH_DRIVER"
+
+Index:
+  Background: Build
+
+Diagnostics:
+  # 抑制一些嵌入式开发中不必要的警告
+  Suppress:
+    - "pp_including_mainfile_in_preamble"
+    - "unused-includes"
