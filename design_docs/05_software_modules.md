@@ -250,10 +250,10 @@ openmv_bridge:
 
 ### 4.1 职责
 
-- 与机械臂控制器通信
+- 通过串口与臂控制器通信（115200 baud，文本协议）
+- 将 ROS2 调用转译为 `$KMS:x,y,z,time!` 等指令
 - 执行取书动作序列
 - 发布 `/joint_states`
-- 提供 `/pick_book` Action 服务端
 - 提供 `/arm_command` Service 服务端
 
 ### 4.2 文件结构
@@ -265,51 +265,168 @@ arm_controller/
 ├── arm_controller/
 │   ├── __init__.py
 │   ├── arm_controller_node.py    # ROS2 节点
-│   ├── arm_driver.py             # 硬件驱动抽象层
-│   ├── pick_sequence.py          # 取书动作序列状态机
-│   └── kinematics.py             # 逆运动学（如需）
+│   ├── six_axis_arm_driver.py    # 串口驱动（发送 $KMS / #xxxPxxx 指令）
+│   └── pick_sequence.py          # 取书动作序列状态机
 ├── config/
-│   ├── arm_params.yaml
-│   └── pick_positions.yaml       # 预定义取书位置
+│   ├── arm_params.yaml           # 串口配置 + 运动学参数
+│   └── pick_positions.yaml       # 预定义位姿（就绪/预抓取/放置等）
 └── launch/
     └── arm_controller.launch.py
 ```
 
-### 4.3 取书动作序列（PickSequence）
+> **注意**：臂端已内置逆运动学（`kinematics_analysis`），RDK X5 侧无需再做 IK，直接发笛卡尔坐标 `(x, y, z)` 即可。因此不需要 `kinematics.py`。
+
+### 4.3 驱动器实现
+
+> **固件已修改**（`source.c`）：新增 `@KMS_OK,<alpha>!` / `@KMS_ERR!` 回执及 `$QSTAT!` / `$QPWM!` 查询。`move_to()` 通过等待回执确认完成，不再盲等时间。
+
+```python
+# six_axis_arm_driver.py
+import serial
+import threading
+import time
+
+class SixAxisArmDriver:
+    """source.c 协议驱动 — 通过 $KMS / #xxxPxxx 指令控制机械臂
+
+    依赖固件新增的 @KMS_OK/@KMS_ERR 回执 + $QSTAT!/$QPWM! 查询
+    """
+
+    def __init__(self, port: str):
+        self.ser = serial.Serial(port, 115200, timeout=0.1)
+        self._last_x = 0.0
+        self._last_y = 0.0
+        self._last_z = 0.0
+        self._last_alpha = 0
+        self._open_pwm = 1500      # 需示教
+        self._close_pwm = 2000     # 需示教
+        self._lock = threading.Lock()
+        self._response = ""
+        self._kms_done = threading.Event()
+        self._reader_thread = threading.Thread(target=self._read_loop, daemon=True)
+        self._reader_thread.start()
+
+    def move_to(self, x_mm: float, y_mm: float, z_mm: float, time_ms: int) -> bool:
+        """笛卡尔空间移动，阻塞等待 @KMS_OK 或 @KMS_ERR 回执"""
+        self._kms_done.clear()
+        with self._lock:
+            self._last_x, self._last_y, self._last_z = x_mm, y_mm, z_mm
+            cmd = f"$KMS:{int(x_mm)},{int(y_mm)},{int(z_mm)},{time_ms}!"
+            self.ser.write(cmd.encode())
+        # 等待回执，超时 = 运动时间 + 2秒
+        if self._kms_done.wait(timeout=(time_ms / 1000.0) + 2.0):
+            return self._kms_ok
+        return False  # 超时
+
+    def get_status(self) -> dict:
+        """查询臂状态，返回 {status, x, y, z, alpha}"""
+        with self._lock:
+            self._response = ""
+            self.ser.write(b"$QSTAT!")
+        time.sleep(0.1)
+        with self._lock:
+            resp = self._response
+        result = {'status': 'UNKNOWN', 'x': 0, 'y': 0, 'z': 0, 'alpha': 0}
+        if resp.startswith('@STATUS:'):
+            parts = resp.replace('!','').split(',')
+            result['status'] = parts[0].split(':')[1]
+            for p in parts[1:]:
+                k, v = p.split('=')
+                result[k] = int(v)
+        return result
+
+    def get_pwm(self) -> list:
+        """查询当前舵机PWM"""
+        with self._lock:
+            self._response = ""
+            self.ser.write(b"$QPWM!")
+        time.sleep(0.1)
+        with self._lock:
+            resp = self._response
+        if resp.startswith('@PWM:'):
+            return [int(v) for v in resp.replace('@PWM:','').replace('!','').split(',')]
+        return []
+
+    def set_servo(self, servo_id: int, pwm: int, time_ms: int = 500):
+        cmd = f"#{servo_id:03d}P{pwm:04d}T{time_ms:04d}!"
+        self.ser.write(cmd.encode())
+        time.sleep((time_ms + 200) / 1000.0)
+
+    def open_gripper(self):
+        self.set_servo(4, self._open_pwm, 500)
+        self.set_servo(5, self._open_pwm, 500)
+
+    def close_gripper(self):
+        self.set_servo(4, self._close_pwm, 500)
+        self.set_servo(5, self._close_pwm, 500)
+
+    def stop(self):
+        self.ser.write(b"$DST!")
+
+    def _read_loop(self):
+        """后台持续读取串口，捕获回执"""
+        buf = ""
+        while True:
+            try:
+                if self.ser.in_waiting:
+                    chunk = self.ser.read(self.ser.in_waiting).decode(errors='ignore')
+                    buf += chunk
+                    if '\n' in buf or '!' in buf:
+                        lines = buf.replace('\n','\n').split('\n')
+                        for line in lines[:-1]:
+                            line = line.strip()
+                            with self._lock:
+                                if line.startswith('@KMS_OK'):
+                                    self._kms_ok = True
+                                    self._kms_done.set()
+                                    parts = line.replace('@KMS_OK,','').replace('!','')
+                                    self._last_alpha = int(parts) if parts else 0
+                                elif line.startswith('@KMS_ERR'):
+                                    self._kms_ok = False
+                                    self._kms_done.set()
+                                elif line.startswith('@STATUS:') or line.startswith('@PWM:'):
+                                    self._response = line
+                        buf = lines[-1]
+            except Exception:
+                pass
+```
+
+
+### 4.4 取书动作序列（PickSequence）
 
 ```
            ┌─────────┐
            │  IDLE   │
            └────┬────┘
-                │ pick_book action received
+                │ pick action received (target_x,y,z)
                 ▼
            ┌─────────┐
-           │  READY  │  移动到就绪位姿
+           │  READY  │  move_to(ready_x, ready_y, ready_z, 1000)
            └────┬────┘
-                │ 到达就绪位姿
+                │
                 ▼
            ┌─────────────┐
-           │  PRE_GRASP  │  移动到书前方5cm
-           └──────┬──────┘
-                  │ 到位
+           │  PRE_GRASP  │  move_to(target_x, target_y-50, target_z, 1000)
+           └──────┬──────┘   (书前方 5cm)
+                  │
                   ▼
            ┌─────────────┐
-           │   GRASP     │  前进→闭爪
-           └──────┬──────┘
-                  │ 抓取成功（夹爪力反馈）
-                  ▼
-           ┌─────────────┐
-           │   LIFT      │  上提3cm
+           │   GRASP     │  move_to(target_x, target_y, target_z, 800) → close_gripper()
            └──────┬──────┘
                   │
                   ▼
            ┌─────────────┐
-           │   RETREAT   │  后退10cm
+           │   LIFT      │  move_to(target_x, target_y, target_z+30, 500)  (上提 30mm)
            └──────┬──────┘
                   │
                   ▼
            ┌─────────────┐
-           │   PLACE     │  移动到载书筐上方→开爪释放
+           │   RETREAT   │  move_to(target_x, target_y-50, target_z+30, 800)
+           └──────┬──────┘
+                  │
+                  ▼
+           ┌─────────────┐
+           │   PLACE     │  move_to(place_x, place_y, place_z, 1000) → open_gripper()
            └──────┬──────┘
                   │
                   ▼
@@ -323,10 +440,31 @@ arm_controller/
            └─────────┘
 ```
 
-### 4.4 动作序列参数（pick_positions.yaml）
+### 4.5 动作序列参数（pick_positions.yaml）
 
 ```yaml
 pick_positions:
+  # 就绪位姿（收拢在机器人上方，不碰撞）
+  ready:    {x: 0, y: 150, z: 50}
+
+  # 放置位姿（载书筐上方）
+  place:    {x: 0, y: -100, z: 80}
+
+  # 夹爪 PWM（需实际示教确定！）
+  open_pwm:  1500    # 全开
+  close_pwm: 2000    # 夹住一本书
+
+  # 臂运动学参数（与 source.c 中 setup_kinematics 一致）
+  L0: 100   # 底座高度 mm
+  L1: 105   # 大臂长度 mm
+  L2: 75    # 小臂长度 mm
+  L3: 180   # 末端长度 mm
+  
+  # 工作空间约束
+  x_range: [-120, 120]   # mm，左右
+  y_range: [50, 250]     # mm，前后
+  z_range: [20, 200]     # mm，高度（相对底座）
+```
   ready:       [0.0, 0.0, -1.57, 0.0, 1.57, 0.0]   # 各关节角度(rad)
   pre_grasp:   [0.1, 0.3, -1.2, 0.0, 1.0, 0.0]     # 根据实际示教修改
   lift_height: 0.03   # 提书高度(m)

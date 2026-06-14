@@ -226,72 +226,189 @@ OpenMV H7 Plus 参考值（QVGA 320×240，镜头 2.8mm）：
 
 ### 3.1 协议概述
 
-机械臂已有自己的固定串口控制协议，不需要重新设计。RDK X5 侧的工作是写一个**适配层（Adapter）**，将 ROS2 层的标准接口（关节角度、夹爪控制）转译为臂控制器支持的协议指令。
+机械臂已有自己的固定串口控制协议（`source.c`），采用**文本分隔符协议**。RDK X5 侧只需按协议格式发送指令，无需修改臂端固件。
 
-- 物理层：UART 串口（或 USB 虚拟串口）
-- 协议：**遵循臂控制器厂商手册**，不做修改
-- 适配层位置：`arm_controller/arm_driver.py` 中实现
+| 属性 | 值 |
+|------|-----|
+| 接口类型 | UART 串口 |
+| 波特率 | **115200** |
+| 数据位 | 8 |
+| 停止位 | 1 |
+| 校验 | 无 |
+| 格式 | 文本行，分隔符 `$...!` / `#...!` / `{...}` |
 
-### 3.2 适配层设计
+### 3.2 机械臂硬件参数
 
-适配层（`ArmDriver` 类）封装臂协议细节，对上层暴露统一接口：
+从 `source.c` 中提取：
+
+```c
+// setup_kinematics(L0, L1, L2, L3, &kinematics);
+setup_kinematics(100, 105, 75, 180, &kinematics);
+// 实际值(放大10倍): L0=1000(即100mm), L1=1050(即105mm), L2=750(即75mm), L3=1800(即180mm)
+```
+
+| 参数 | 值 | 说明 |
+|------|-----|------|
+| L0 (底座高度) | 100 mm | 底盘到肩关节 |
+| L1 (大臂长度) | 105 mm | 肩到肘 |
+| L2 (小臂长度) | 75 mm | 肘到腕 |
+| L3 (末端长度) | 180 mm | 腕到夹爪 |
+| 舵机数量 | 6 | 引脚 {7, 3, 5, 6, 9, 8} |
+| 臂身舵机 | 0~3 号 | 底座旋转 + 肩 + 肘 + 腕（运动学解算） |
+| 夹爪舵机 | 4~5 号 | 末端执行器开合 |
+| PWM 范围 | 500 ~ 2500 | 标准舵机 |
+| 3/4 号舵机 | 反向 (3000-PWM) | 机械结构原因 |
+
+### 3.3 核心指令
+
+#### 3.3.1 运动学移动（最重要）
+
+```
+发送: $KMS:x,y,z,time!
+```
+
+- `x, y, z` — 末端目标坐标（单位：mm），原点在底座中心
+- `time` — 移动时间（ms）
+- 臂端自动搜索最佳 Alpha 角（0° ~ -135°）并执行
+- **成功**：蜂鸣1声，串口回复 `@KMS_OK,<alpha>!`（alpha 为实际采用的逼近角度）
+- **失败**：蜂鸣2声，串口回复 `@KMS_ERR!`，加打 `Can not find best pos!!!`
+
+```
+示例: $KMS:150,0,80,1000!
+含义: 末端移动到 (150, 0, 80)mm，耗时 1000ms
+```
+
+#### 3.3.2 单舵机控制
+
+```
+发送: #{id}P{pwm}T{time}!
+发送: #255P{pwm}T{time}!    ← 同时控制全部6个舵机
+```
+
+- `id` — 舵机编号 0~5
+- `pwm` — PWM 值 500~2500
+- `time` — 执行时间（ms）
+
+```
+示例: #004P2000T500!    ← 4号舵机(夹爪)移到 PWM 2000，耗时500ms
+示例: #255P1500T1000!   ← 全部舵机归中
+```
+
+#### 3.3.3 停止
+
+```
+发送: $DST!         ← 停止所有舵机（保持当前位姿）
+发送: $DST:N!       ← 停止指定舵机 N
+```
+
+#### 3.3.4 复位
+
+```
+发送: $RST!         ← 软复位臂控制器
+```
+
+#### 3.3.5 状态查询 `$QSTAT!`（新增）
+
+查询臂当前状态，回复 `@STATUS:` 开头的一行：
+
+```
+发送: $QSTAT!
+回复: @STATUS:IDLE,x=150,y=0,z=80,alpha=-45!
+回复: @STATUS:BUSY,x=150,y=0,z=80,alpha=-45!
+回复: @STATUS:ERROR,x=150,y=0,z=80,alpha=-45!
+```
+
+| 状态 | 含义 |
+|------|------|
+| IDLE | 所有舵机停止 + 无动作组在执行 |
+| BUSY | 任一舵机正在移动 或 动作组执行中 |
+| ERROR | 最近一次 `$KMS` 执行失败 |
+| x,y,z | 最近一次 `$KMS` 的目标坐标（mm） |
+| alpha | 最近一次 `$KMS` 采用的逼近角（度） |
+
+#### 3.3.6 PWM 查询 `$QPWM!`（新增）
+
+查询所有舵机当前 PWM 值：
+
+```
+发送: $QPWM!
+回复: @PWM:1500,2200,2500,1800,1500,1500!
+// 对应舵机 0,1,2,3,4,5 的当前 PWM
+```
+
+#### 3.3.7 动作组（预编程，可选）
+
+```
+发送: $DGT:start-end,times!   ← 执行 flash 中预存的动作组
+```
+
+> 动作组需提前通过 `<...>` 指令烧录到臂控制器的 W25Q64 Flash 中。正常取书流程不依赖此功能，用 `$KMS` 逐点控制即可。
+
+### 3.4 适配层设计
+
+适配层（`SixAxisArmDriver`）将 ROS2 调用转译为上述文本指令：
 
 ```python
-class ArmDriver(ABC):
-    """机械臂驱动抽象基类"""
+class SixAxisArmDriver:
+    """基于 source.c 协议的 6 轴机械臂驱动"""
     
-    @abstractmethod
-    def connect(self, port: str, baudrate: int) -> bool: ...
+    BAUDRATE = 115200
     
-    @abstractmethod
-    def set_joint_angles(self, angles: List[float]) -> bool:
-        """设置6个关节角度（弧度），阻塞直到指令发送"""
+    def __init__(self, port: str):
+        self.ser = serial.Serial(port, self.BAUDRATE, timeout=0.5)
+    
+    def move_to(self, x_mm: float, y_mm: float, z_mm: float, time_ms: int) -> bool:
+        """运动学移动，发送 $KMS:x,y,z,time!"""
+        cmd = f"$KMS:{int(x_mm)},{int(y_mm)},{int(z_mm)},{time_ms}!"
+        self.ser.write(cmd.encode())
+        # 等待响应（臂端会打印结果）
         ...
     
-    @abstractmethod
-    def get_joint_angles(self) -> Optional[List[float]]:
-        """读取当前关节角度"""
+    def set_gripper(self, pwm: int) -> bool:
+        """夹爪控制（舵机4和5）"""
+        cmd = f"#255P{pwm}T500!"
+        self.ser.write(cmd.encode())
         ...
     
-    @abstractmethod
-    def set_gripper(self, position: float) -> bool:
-        """夹爪控制：0.0=全开，1.0=全闭"""
-        ...
+    def open_gripper(self) -> bool:
+        """开爪 — 需根据实际机械结构确定 PWM 值"""
+        return self.set_gripper(1500)  # 示例值，需示教确认
     
-    @abstractmethod
-    def get_status(self) -> int:
-        """返回状态码：0=空闲 1=忙 2=错误 3=归零中"""
-        ...
+    def close_gripper(self) -> bool:
+        """闭爪 — 需根据实际机械结构确定 PWM 值"""
+        return self.set_gripper(2000)  # 示例值，需示教确认
     
-    @abstractmethod
-    def emergency_stop(self) -> bool: ...
+    def stop(self):
+        """紧急停止"""
+        self.ser.write(b"$DST!")
+    
+    def reset(self):
+        """软复位"""
+        self.ser.write(b"$RST!")
 ```
 
-**具体实现**：根据臂控制器的手册，继承 `ArmDriver`，实现 `XArmDriver` / `BusServoDriver` 等具体类。上层 `PickSequence` 状态机只依赖抽象接口，不感知具体协议。
-
-### 3.3 取书动作序列
-
-取书序列由 `pick_sequence.py` 中的状态机管理，每步调用 `ArmDriver` 的抽象接口：
+### 3.5 取书动作序列（用 $KMS 实现）
 
 ```
-步骤1: 移动到就绪位姿 → set_joint_angles(ready_pose)
-步骤2: 移动到预抓取位姿 → set_joint_angles(pre_grasp_pose)
-步骤3: 直线前进到抓取位姿 → set_joint_angles(grasp_pose)
-步骤4: 闭合夹爪 → set_gripper(1.0)
-步骤5: 垂直提书 3cm → set_joint_angles(lift_pose)
-步骤6: 后退 10cm → set_joint_angles(retreat_pose)
-步骤7: 移动到放置位姿 → set_joint_angles(place_pose)
-步骤8: 打开夹爪释放 → set_gripper(0.0)
-步骤9: 返回就绪位姿 → set_joint_angles(ready_pose)
+步骤1: 就绪位姿 → $KMS:ready_x,ready_y,ready_z,1000!
+步骤2: 预抓取位姿 → $KMS:pre_x,pre_y,pre_z,1000!
+步骤3: 抓取位姿 → $KMS:grasp_x,grasp_y,grasp_z,800!
+步骤4: 闭爪 → #004P{close_pwm}T500! + #005P{close_pwm}T500!
+步骤5: 上提 → $KMS:grasp_x,grasp_y,grasp_z+30,500!
+步骤6: 后退 → $KMS:pre_x,pre_y,pre_z,800!
+步骤7: 放置位姿 → $KMS:place_x,place_y,place_z,1000!
+步骤8: 开爪 → #004P{open_pwm}T500! + #005P{open_pwm}T500!
+步骤9: 就绪位姿 → $KMS:ready_x,ready_y,ready_z,1000!
 ```
 
-### 3.4 你需要提供的臂协议信息
+### 3.6 需要示教确定的参数
 
-在实现适配层之前，请确认臂手册中的以下内容：
-
-1. 串口参数（波特率、数据位、停止位、校验）
-2. 设置关节角度的指令格式（字节序列）
-3. 读取关节角度的指令格式
-4. 夹爪控制指令格式
-5. 状态查询指令格式
-6. 指令的响应/确认方式
+| 参数 | 说明 | 确定方法 |
+|------|------|----------|
+| ready 位姿 (x,y,z) | 收拢状态 | 在 `$KMS` 模式下试出安全位姿 |
+| pre_grasp 位姿 | 书前方 5cm | 根据书架坐标+书本坐标计算 |
+| grasp 位姿 | 抓取点 | 对位完成后计算 |
+| place 位姿 | 载书筐上方 | 实测 |
+| open_pwm | 开爪 PWM | 示教，夹爪全开时的 PWM |
+| close_pwm | 闭爪 PWM | 示教，夹住一本书时的 PWM |
+| Alpha 范围 | 有效逼近角 | 当前代码搜索 0°~-135° |
