@@ -1,0 +1,63 @@
+/slam_gmapping:
+  ros__parameters:
+    # ── 帧定义 ──
+    base_frame: base_footprint
+    map_frame: map
+    odom_frame: odom
+
+    # ── 扫描匹配精度 ──
+    particles: 80               # 粒子数 (30→80, 更稳定但更吃CPU)
+    iterations: 10              # 扫描匹配迭代 (5→10)
+    minimum_score: 50.0         # 最小匹配分数 (0→50, 拒绝低质量匹配)
+    lsigma: 0.075
+    ogain: 3.0
+    lskip: 0
+    kernelSize: 1
+    delta: 0.05
+    sigma: 0.05
+    lstep: 0.05
+    astep: 0.05
+
+    # ── 运动模型噪声 (里程计不准时调大) ──
+    srr: 0.1                    # 平移噪声(平移→平移)
+    srt: 0.2                    # 平移噪声(平移→旋转)
+    str: 0.1                    # 旋转噪声(旋转→平移)
+    stt: 0.2                    # 旋转噪声(旋转→旋转)
+
+    # ── 更新频率 ──
+    linearUpdate: 0.5           # 每0.5m移动更新 (1.0→0.5, 更频繁)
+    angularUpdate: 0.3          # 每0.3rad旋转更新 (0.5→0.3)
+    temporalUpdate: 0.5         # 最小更新间隔 (1.0→0.5)
+    map_update_interval: 3.0    # 地图发布间隔 (5.0→3.0)
+    transform_publish_period: 0.05
+
+    # ── 激光参数 ──
+    maxRange: 6.0               # 最大使用距离
+    maxUrange: 4.0              # 可靠使用距离
+    lasamplerange: 0.005
+    lasamplestep: 0.005
+    llsamplerange: 0.01
+    llsamplestep: 0.01
+
+    # ── 其他 ──
+    occ_thresh: 0.25
+    resampleThreshold: 0.5
+    use_sim_time: false
+    xmax: 20.0
+    xmin: -20.0
+    ymax: 20.0
+    ymin: -20.0
+
+    qos_overrides:
+      /parameter_events:
+        publisher:
+          depth: 1000
+          durability: volatile
+          history: keep_all
+          reliability: reliable
+      /tf:
+        publisher:
+          depth: 1000
+          durability: volatile
+          history: keep_last
+          reliability: reliable
