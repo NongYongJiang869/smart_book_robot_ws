@@ -20,6 +20,10 @@ stm32_bridge:
     odom_frame: "odom"
     base_frame: "base_link"
 
+    # ── 电机补偿 ──
+    right_motor_ratio_fwd: 0.95   # 前进: 右轮转速比补偿
+    rev_comp_angular: 0.25         # 倒车: 固定右转补偿 rad/s (基准0.3m/s, 速度等比缩放)
+
     # ── 发布/指令频率 ──
     publish_rate: 50.0             # 主循环+里程计发布 (Hz)
     cmd_rate: 100.0                # 速度指令发送 (Hz)

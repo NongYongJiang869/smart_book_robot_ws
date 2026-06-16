@@ -68,8 +68,10 @@ class STM32BridgeNode(Node):
                 ('cmd_timeout_ms', 200),
                 ('odom_frame', 'odom'),
                 ('base_frame', 'base_link'),
-                ('publish_rate', 50.0),      # 主循环频率
-                ('cmd_rate', 100.0),         # 速度指令发送频率
+                ('publish_rate', 50.0),
+                ('cmd_rate', 100.0),
+                ('right_motor_ratio_fwd', 1.08),
+                ('rev_comp_angular', 0.7),  # 倒车时补偿的角速度 rad/s (基准0.3m/s)
             ]
         )
 
@@ -125,6 +127,9 @@ class STM32BridgeNode(Node):
         self._last_status = None
 
         self.get_logger().info('STM32 Bridge 节点已启动')
+        self.get_logger().info(
+            f'补偿参数: fwd={self.get_parameter("right_motor_ratio_fwd").value:.3f} '
+            f'rev_comp={self.get_parameter("rev_comp_angular").value:.3f}')
 
     # ============================================================
     # 订阅回调
@@ -144,13 +149,28 @@ class STM32BridgeNode(Node):
     # ============================================================
 
     def _send_vel_loop(self):
-        """周期性发送速度指令, 超时则发送零速"""
+        """周期性发送速度指令, 超时则发送零速, 含电机补偿"""
         now = self.get_clock().now()
         if now - self._last_cmd_time > self._cmd_timeout:
             self._linear_x = 0.0
             self._angular_z = 0.0
 
-        frame = self.proto.encode_vel_cmd(self._linear_x, self._angular_z)
+        linear  = self._linear_x
+        angular = self._angular_z
+
+        # 电机补偿: 前进用比例, 倒车用固定偏移
+        if abs(angular) < 0.01 and abs(linear) > 0.01:
+            if linear > 0:
+                L = self.get_parameter('wheel_base').value
+                r = self.get_parameter('right_motor_ratio_fwd').value
+                angular += linear * (r - 1.0) * 2.0 / (L * (r + 1.0))
+            else:
+                angular += self.get_parameter('rev_comp_angular').value * (abs(linear) / 0.3)
+            self.get_logger().info(
+                f'补偿: lin={self._linear_x:.2f} ang={self._angular_z:.2f} → out={angular:.3f}',
+                throttle_duration_sec=1.0)
+
+        frame = self.proto.encode_vel_cmd(linear, angular)
         try:
             self.ser.write(frame)
         except serial.SerialException as e:

@@ -37,6 +37,7 @@ PROJECT_C_SOURCES := \
 	src/bsp_usart.c \
 	src/encoder.c \
 	src/protocol.c \
+	src/mpu6050.c \
 	src/stm32f10x_it.c \
 	src/system_stm32f10x.c
 

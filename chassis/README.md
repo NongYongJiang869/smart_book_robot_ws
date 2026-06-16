@@ -20,6 +20,16 @@ C2 -> PA9  (TIM1_CH2)
 C1 -> PB6  (TIM4_CH1)
 C2 -> PB7  (TIM4_CH2)
 
+### MPU6050 IMU (软件 I2C)
+SCL -> PB8
+SDA -> PB9
+VCC -> 3.3V
+GND -> GND
+AD0 -> GND
+地址: 0x68
+量程: 陀螺 ±250°/s, 加速度 ±2g
+> 用软件 GPIO 模拟 I2C, 不依赖硬件 I2C 外设
+
 ### 串口 (与 RDK X5 通信)
 USART2_TX -> PA2
 USART2_RX -> PA3

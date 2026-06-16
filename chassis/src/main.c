@@ -17,12 +17,15 @@
 #include "bsp_usart.h"
 #include "encoder.h"
 #include "protocol.h"
+#include "mpu6050.h"
 
 /* ── 运动学参数 ── */
 #define MAX_PWM            999     /* PWM 最大值 (0~999) */
 #define MAX_LINEAR_SPEED   0.5f    /* 最大线速度 m/s (与 ROS2 侧一致) */
 #define MAX_ANGULAR_SPEED  1.0f    /* 最大角速度 rad/s */
 #define WHEEL_BASE         0.35f   /* 左右轮间距 (m) — 需实测标定 */
+
+/* ── 陀螺参数 (仅上报, 不参与电机控制) ── */
 
 /* ── 帧发送间隔 ── */
 #define ODOM_INTERVAL_MS      20
@@ -115,6 +118,19 @@ int main(void)
     bsp_usart2_init();
     encoder_init();
     protocol_init();
+    mpu6050_init();         /* I2C2: PB10=SCL, PB11=SDA */
+
+    /* 启动诊断: 通过串口输出 MPU6050 状态
+     * 用二进制帧查看不方便, 这里直接发 ASCII 到串口供调试 */
+    for (volatile int i = 0; i < 500000; i++) {}  /* 等 USART 稳定 */
+    if (mpu6050_is_ok())
+    {
+        USART_SendData(USART2, 'M');  /* M = MPU6050 OK */
+    }
+    else
+    {
+        USART_SendData(USART2, 'X');  /* X = MPU6050 FAIL (检查 PB10/PB11 上拉电阻) */
+    }
 
     uint32_t last_odom      = 0;
     uint32_t last_status    = 0;
@@ -155,13 +171,23 @@ int main(void)
         {
             target_linear  = 0.0f;
             target_angular = 0.0f;
-            cmd_received = 0;  /* 不再重复刹车 */
+            cmd_received = 0;
+        }
+
+        /* ── 读 IMU (缓存供 ODOM_DATA 和直行校正使用) ── */
+        int16_t gyro_z, accel_x, accel_y;
+        if (mpu6050_read(&gyro_z, &accel_x, &accel_y) != 0)
+        {
+            gyro_z = 0; accel_x = 0; accel_y = 0;
         }
 
         /* ── 执行速度指令 ── */
         int16_t left_pwm, right_pwm;
         vel_to_pwm(target_linear, target_angular, &left_pwm, &right_pwm);
-        left_pwm  *= LEFT_INVERT;    /* 方向校正 */
+
+        /* 纯差速: 不做任何校正, IMU 数据仅通过 ODOM_DATA 上报 */
+
+        left_pwm  *= LEFT_INVERT;
         right_pwm *= RIGHT_INVERT;
         set_motors(left_pwm, right_pwm);
 
@@ -179,7 +205,7 @@ int main(void)
             protocol_send_odom_data(
                 left_total, right_total,
                 left_speed, right_speed,
-                0, 0, 0,      /* IMU 未安装 */
+                gyro_z, accel_x, accel_y,
                 ts);
         }
 
@@ -190,7 +216,7 @@ int main(void)
             uint8_t motor_state  = (cmd_received || target_linear != 0.0f || target_angular != 0.0f) ? 0x03 : 0x00;
             uint8_t sensor_state = 0x00;   /* 急停/碰撞未安装 */
             int16_t mcu_temp     = 2500;   /* 25.00°C 占位 */
-            uint16_t error_code  = 0;
+            uint16_t error_code  = mpu6050_is_ok() ? 0 : PROTO_ERR_IMU_FAULT;
             protocol_send_status(motor_state, sensor_state, mcu_temp, error_code);
         }
 
