@@ -1,0 +1,369 @@
+[0.699s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build', '--packages-select', 'stm32_bridge']
+[0.700s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=8, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=['stm32_bridge'], packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0xffff7db44970>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0xffff7db444f0>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0xffff7db444f0>>)
+[0.959s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.960s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.960s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.960s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.961s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.961s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.961s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/root/smart_book_robot_ws/chassis'
+[0.962s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.963s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.963s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.963s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.963s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.964s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.964s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.964s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.964s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[1.066s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[1.066s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[1.067s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[1.067s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[1.067s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[1.068s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[1.069s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[1.069s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[1.070s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extensions ['ignore', 'ignore_ament_install']
+[1.070s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extension 'ignore'
+[1.071s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extension 'ignore_ament_install'
+[1.071s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extensions ['colcon_pkg']
+[1.071s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extension 'colcon_pkg'
+[1.072s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extensions ['colcon_meta']
+[1.072s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extension 'colcon_meta'
+[1.072s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extensions ['ros']
+[1.072s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extension 'ros'
+[1.073s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extensions ['cmake', 'python']
+[1.073s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extension 'cmake'
+[1.073s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extension 'python'
+[1.074s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extensions ['python_setup_py']
+[1.074s] Level 1:colcon.colcon_core.package_identification:_identify(inc) by extension 'python_setup_py'
+[1.074s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[1.075s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[1.075s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[1.076s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extensions ['ignore', 'ignore_ament_install']
+[1.076s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extension 'ignore'
+[1.077s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extension 'ignore_ament_install'
+[1.077s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extensions ['colcon_pkg']
+[1.077s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extension 'colcon_pkg'
+[1.077s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extensions ['colcon_meta']
+[1.078s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extension 'colcon_meta'
+[1.078s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extensions ['ros']
+[1.078s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extension 'ros'
+[1.079s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extensions ['cmake', 'python']
+[1.079s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extension 'cmake'
+[1.079s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extension 'python'
+[1.080s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extensions ['python_setup_py']
+[1.080s] Level 1:colcon.colcon_core.package_identification:_identify(ld) by extension 'python_setup_py'
+[1.080s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[1.081s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[1.081s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[1.082s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[1.082s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[1.082s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[1.083s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[1.083s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[1.083s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[1.083s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[1.084s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[1.084s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[1.084s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[1.085s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[1.085s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[1.085s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[1.085s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[1.086s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extensions ['ignore', 'ignore_ament_install']
+[1.086s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extension 'ignore'
+[1.086s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extension 'ignore_ament_install'
+[1.087s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extensions ['colcon_pkg']
+[1.087s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extension 'colcon_pkg'
+[1.087s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extensions ['colcon_meta']
+[1.087s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extension 'colcon_meta'
+[1.088s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extensions ['ros']
+[1.088s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extension 'ros'
+[1.088s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extensions ['cmake', 'python']
+[1.089s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extension 'cmake'
+[1.089s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extension 'python'
+[1.089s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extensions ['python_setup_py']
+[1.089s] Level 1:colcon.colcon_core.package_identification:_identify(startup) by extension 'python_setup_py'
+[1.090s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extensions ['ignore', 'ignore_ament_install']
+[1.090s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extension 'ignore'
+[1.090s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extension 'ignore_ament_install'
+[1.091s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extensions ['colcon_pkg']
+[1.091s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extension 'colcon_pkg'
+[1.091s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extensions ['colcon_meta']
+[1.092s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extension 'colcon_meta'
+[1.092s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extensions ['ros']
+[1.092s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extension 'ros'
+[1.093s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extensions ['cmake', 'python']
+[1.093s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extension 'cmake'
+[1.093s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extension 'python'
+[1.093s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extensions ['python_setup_py']
+[1.093s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib) by extension 'python_setup_py'
+[1.094s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extensions ['ignore', 'ignore_ament_install']
+[1.095s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extension 'ignore'
+[1.095s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extension 'ignore_ament_install'
+[1.095s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extensions ['colcon_pkg']
+[1.095s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extension 'colcon_pkg'
+[1.096s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extensions ['colcon_meta']
+[1.096s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extension 'colcon_meta'
+[1.096s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extensions ['ros']
+[1.096s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extension 'ros'
+[1.097s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extensions ['cmake', 'python']
+[1.097s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extension 'cmake'
+[1.097s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extension 'python'
+[1.097s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extensions ['python_setup_py']
+[1.098s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS) by extension 'python_setup_py'
+[1.098s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extensions ['ignore', 'ignore_ament_install']
+[1.099s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extension 'ignore'
+[1.099s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extension 'ignore_ament_install'
+[1.099s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extensions ['colcon_pkg']
+[1.100s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extension 'colcon_pkg'
+[1.100s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extensions ['colcon_meta']
+[1.100s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extension 'colcon_meta'
+[1.100s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extensions ['ros']
+[1.100s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extension 'ros'
+[1.101s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extensions ['cmake', 'python']
+[1.101s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extension 'cmake'
+[1.101s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extension 'python'
+[1.102s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extensions ['python_setup_py']
+[1.102s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3) by extension 'python_setup_py'
+[1.103s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extensions ['ignore', 'ignore_ament_install']
+[1.103s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extension 'ignore'
+[1.103s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extension 'ignore_ament_install'
+[1.104s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extensions ['colcon_pkg']
+[1.104s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extension 'colcon_pkg'
+[1.104s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extensions ['colcon_meta']
+[1.104s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extension 'colcon_meta'
+[1.105s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extensions ['ros']
+[1.105s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extension 'ros'
+[1.105s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extensions ['cmake', 'python']
+[1.106s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extension 'cmake'
+[1.106s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extension 'python'
+[1.106s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extensions ['python_setup_py']
+[1.106s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/CoreSupport) by extension 'python_setup_py'
+[1.107s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extensions ['ignore', 'ignore_ament_install']
+[1.108s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extension 'ignore'
+[1.108s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extension 'ignore_ament_install'
+[1.108s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extensions ['colcon_pkg']
+[1.108s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extension 'colcon_pkg'
+[1.109s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extensions ['colcon_meta']
+[1.109s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extension 'colcon_meta'
+[1.109s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extensions ['ros']
+[1.109s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extension 'ros'
+[1.110s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extensions ['cmake', 'python']
+[1.110s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extension 'cmake'
+[1.110s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extension 'python'
+[1.110s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extensions ['python_setup_py']
+[1.111s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport) by extension 'python_setup_py'
+[1.111s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extensions ['ignore', 'ignore_ament_install']
+[1.112s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extension 'ignore'
+[1.112s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extension 'ignore_ament_install'
+[1.112s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extensions ['colcon_pkg']
+[1.113s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extension 'colcon_pkg'
+[1.113s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extensions ['colcon_meta']
+[1.113s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extension 'colcon_meta'
+[1.113s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extensions ['ros']
+[1.114s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extension 'ros'
+[1.114s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extensions ['cmake', 'python']
+[1.114s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extension 'cmake'
+[1.115s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extension 'python'
+[1.115s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extensions ['python_setup_py']
+[1.115s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST) by extension 'python_setup_py'
+[1.116s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extensions ['ignore', 'ignore_ament_install']
+[1.116s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extension 'ignore'
+[1.116s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extension 'ignore_ament_install'
+[1.117s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extensions ['colcon_pkg']
+[1.117s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extension 'colcon_pkg'
+[1.117s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extensions ['colcon_meta']
+[1.117s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extension 'colcon_meta'
+[1.118s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extensions ['ros']
+[1.118s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extension 'ros'
+[1.119s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extensions ['cmake', 'python']
+[1.119s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extension 'cmake'
+[1.119s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extension 'python'
+[1.119s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extensions ['python_setup_py']
+[1.120s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x) by extension 'python_setup_py'
+[1.121s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extensions ['ignore', 'ignore_ament_install']
+[1.121s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extension 'ignore'
+[1.121s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extension 'ignore_ament_install'
+[1.122s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extensions ['colcon_pkg']
+[1.122s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extension 'colcon_pkg'
+[1.122s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extensions ['colcon_meta']
+[1.122s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extension 'colcon_meta'
+[1.123s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extensions ['ros']
+[1.123s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extension 'ros'
+[1.124s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extensions ['cmake', 'python']
+[1.124s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extension 'cmake'
+[1.124s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extension 'python'
+[1.124s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extensions ['python_setup_py']
+[1.124s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup) by extension 'python_setup_py'
+[1.125s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extensions ['ignore', 'ignore_ament_install']
+[1.126s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extension 'ignore'
+[1.126s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extension 'ignore_ament_install'
+[1.127s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extensions ['colcon_pkg']
+[1.127s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extension 'colcon_pkg'
+[1.127s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extensions ['colcon_meta']
+[1.127s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extension 'colcon_meta'
+[1.128s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extensions ['ros']
+[1.128s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extension 'ros'
+[1.129s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extensions ['cmake', 'python']
+[1.129s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extension 'cmake'
+[1.129s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extension 'python'
+[1.129s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extensions ['python_setup_py']
+[1.129s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO) by extension 'python_setup_py'
+[1.130s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extensions ['ignore', 'ignore_ament_install']
+[1.131s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extension 'ignore'
+[1.131s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extension 'ignore_ament_install'
+[1.131s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extensions ['colcon_pkg']
+[1.132s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extension 'colcon_pkg'
+[1.132s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extensions ['colcon_meta']
+[1.132s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extension 'colcon_meta'
+[1.132s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extensions ['ros']
+[1.133s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extension 'ros'
+[1.133s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extensions ['cmake', 'python']
+[1.133s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extension 'cmake'
+[1.134s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extension 'python'
+[1.134s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extensions ['python_setup_py']
+[1.134s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/arm) by extension 'python_setup_py'
+[1.135s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extensions ['ignore', 'ignore_ament_install']
+[1.135s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extension 'ignore'
+[1.136s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extension 'ignore_ament_install'
+[1.136s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extensions ['colcon_pkg']
+[1.136s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extension 'colcon_pkg'
+[1.136s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extensions ['colcon_meta']
+[1.136s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extension 'colcon_meta'
+[1.137s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extensions ['ros']
+[1.137s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extension 'ros'
+[1.138s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extensions ['cmake', 'python']
+[1.138s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extension 'cmake'
+[1.138s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extension 'python'
+[1.138s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extensions ['python_setup_py']
+[1.138s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7) by extension 'python_setup_py'
+[1.139s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extensions ['ignore', 'ignore_ament_install']
+[1.140s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extension 'ignore'
+[1.140s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extension 'ignore_ament_install'
+[1.140s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extensions ['colcon_pkg']
+[1.141s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extension 'colcon_pkg'
+[1.141s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extensions ['colcon_meta']
+[1.141s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extension 'colcon_meta'
+[1.142s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extensions ['ros']
+[1.142s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extension 'ros'
+[1.142s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extensions ['cmake', 'python']
+[1.142s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extension 'cmake'
+[1.143s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extension 'python'
+[1.143s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extensions ['python_setup_py']
+[1.143s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/iar) by extension 'python_setup_py'
+[1.144s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extensions ['ignore', 'ignore_ament_install']
+[1.144s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extension 'ignore'
+[1.145s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extension 'ignore_ament_install'
+[1.145s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extensions ['colcon_pkg']
+[1.145s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extension 'colcon_pkg'
+[1.145s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extensions ['colcon_meta']
+[1.145s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extension 'colcon_meta'
+[1.146s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extensions ['ros']
+[1.146s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extension 'ros'
+[1.147s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extensions ['cmake', 'python']
+[1.147s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extension 'cmake'
+[1.147s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extension 'python'
+[1.147s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extensions ['python_setup_py']
+[1.147s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/CMSIS/Documentation) by extension 'python_setup_py'
+[1.148s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extensions ['ignore', 'ignore_ament_install']
+[1.149s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extension 'ignore'
+[1.149s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extension 'ignore_ament_install'
+[1.149s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extensions ['colcon_pkg']
+[1.149s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extension 'colcon_pkg'
+[1.150s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extensions ['colcon_meta']
+[1.150s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extension 'colcon_meta'
+[1.150s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extensions ['ros']
+[1.150s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extension 'ros'
+[1.151s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extensions ['cmake', 'python']
+[1.151s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extension 'cmake'
+[1.151s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extension 'python'
+[1.152s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extensions ['python_setup_py']
+[1.152s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver) by extension 'python_setup_py'
+[1.153s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extensions ['ignore', 'ignore_ament_install']
+[1.153s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extension 'ignore'
+[1.153s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extension 'ignore_ament_install'
+[1.154s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extensions ['colcon_pkg']
+[1.154s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extension 'colcon_pkg'
+[1.154s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extensions ['colcon_meta']
+[1.154s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extension 'colcon_meta'
+[1.155s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extensions ['ros']
+[1.155s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extension 'ros'
+[1.155s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extensions ['cmake', 'python']
+[1.155s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extension 'cmake'
+[1.156s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extension 'python'
+[1.156s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extensions ['python_setup_py']
+[1.156s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/inc) by extension 'python_setup_py'
+[1.157s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extensions ['ignore', 'ignore_ament_install']
+[1.157s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extension 'ignore'
+[1.158s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extension 'ignore_ament_install'
+[1.158s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extensions ['colcon_pkg']
+[1.158s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extension 'colcon_pkg'
+[1.158s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extensions ['colcon_meta']
+[1.158s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extension 'colcon_meta'
+[1.159s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extensions ['ros']
+[1.159s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extension 'ros'
+[1.160s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extensions ['cmake', 'python']
+[1.160s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extension 'cmake'
+[1.160s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extension 'python'
+[1.160s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extensions ['python_setup_py']
+[1.160s] Level 1:colcon.colcon_core.package_identification:_identify(stdlib/STM32F10x_StdPeriph_Driver/src) by extension 'python_setup_py'
+[1.161s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extensions ['ignore', 'ignore_ament_install']
+[1.162s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extension 'ignore'
+[1.162s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extension 'ignore_ament_install'
+[1.162s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extensions ['colcon_pkg']
+[1.162s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extension 'colcon_pkg'
+[1.163s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extensions ['colcon_meta']
+[1.163s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extension 'colcon_meta'
+[1.163s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extensions ['ros']
+[1.163s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extension 'ros'
+[1.164s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extensions ['cmake', 'python']
+[1.164s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extension 'cmake'
+[1.164s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extension 'python'
+[1.164s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extensions ['python_setup_py']
+[1.165s] Level 1:colcon.colcon_core.package_identification:_identify(tools) by extension 'python_setup_py'
+[1.165s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extensions ['ignore', 'ignore_ament_install']
+[1.166s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extension 'ignore'
+[1.166s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extension 'ignore_ament_install'
+[1.166s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extensions ['colcon_pkg']
+[1.166s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extension 'colcon_pkg'
+[1.167s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extensions ['colcon_meta']
+[1.167s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extension 'colcon_meta'
+[1.167s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extensions ['ros']
+[1.167s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extension 'ros'
+[1.168s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extensions ['cmake', 'python']
+[1.168s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extension 'cmake'
+[1.168s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extension 'python'
+[1.168s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extensions ['python_setup_py']
+[1.169s] Level 1:colcon.colcon_core.package_identification:_identify(tools/openocd) by extension 'python_setup_py'
+[1.169s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[1.169s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[1.169s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[1.170s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[1.170s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[1.171s] WARNING:colcon.colcon_core.package_selection:ignoring unknown package 'stm32_bridge' in --packages-select
+[1.289s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[1.289s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[1.299s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 4 installed packages in /laser/yahboomcar_ws/install
+[1.308s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 278 installed packages in /opt/ros/humble
+[1.320s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[1.602s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[1.607s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[1.608s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[1.608s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[1.609s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[1.609s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[1.610s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[1.620s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[1.622s] INFO:colcon.colcon_core.shell:Creating prefix script '/root/smart_book_robot_ws/chassis/install/local_setup.ps1'
+[1.628s] INFO:colcon.colcon_core.shell:Creating prefix util module '/root/smart_book_robot_ws/chassis/install/_local_setup_util_ps1.py'
+[1.638s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/root/smart_book_robot_ws/chassis/install/setup.ps1'
+[1.646s] INFO:colcon.colcon_core.shell:Creating prefix script '/root/smart_book_robot_ws/chassis/install/local_setup.sh'
+[1.651s] INFO:colcon.colcon_core.shell:Creating prefix util module '/root/smart_book_robot_ws/chassis/install/_local_setup_util_sh.py'
+[1.656s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/root/smart_book_robot_ws/chassis/install/setup.sh'
+[1.664s] INFO:colcon.colcon_core.shell:Creating prefix script '/root/smart_book_robot_ws/chassis/install/local_setup.bash'
+[1.667s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/root/smart_book_robot_ws/chassis/install/setup.bash'
+[1.675s] INFO:colcon.colcon_core.shell:Creating prefix script '/root/smart_book_robot_ws/chassis/install/local_setup.zsh'
+[1.679s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/root/smart_book_robot_ws/chassis/install/setup.zsh'

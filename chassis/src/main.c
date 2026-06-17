@@ -25,7 +25,11 @@
 #define MAX_ANGULAR_SPEED  1.0f    /* 最大角速度 rad/s */
 #define WHEEL_BASE         0.35f   /* 左右轮间距 (m) — 需实测标定 */
 
-/* ── 陀螺参数 (仅上报, 不参与电机控制) ── */
+/* ── 单轮 PWM 补偿 (直接在 PWM 层面修正机械不平衡) ── */
+#define FWD_LEFT_SCALE   1.00f
+#define FWD_RIGHT_SCALE  1.00f  /* 前进: >1 给右轮加力 */
+#define REV_LEFT_SCALE   1.00f
+#define REV_RIGHT_SCALE  1.00f  /* 倒车: >1 给右轮加力 */
 
 /* ── 帧发送间隔 ── */
 #define ODOM_INTERVAL_MS      20
@@ -185,7 +189,14 @@ int main(void)
         int16_t left_pwm, right_pwm;
         vel_to_pwm(target_linear, target_angular, &left_pwm, &right_pwm);
 
-        /* 纯差速: 不做任何校正, IMU 数据仅通过 ODOM_DATA 上报 */
+        /* 单轮 PWM 补偿: 前进/后退分别缩放 */
+        if (target_linear > 0.01f) {
+            left_pwm  = (int16_t)(left_pwm  * FWD_LEFT_SCALE);
+            right_pwm = (int16_t)(right_pwm * FWD_RIGHT_SCALE);
+        } else if (target_linear < -0.01f) {
+            left_pwm  = (int16_t)(left_pwm  * REV_LEFT_SCALE);
+            right_pwm = (int16_t)(right_pwm * REV_RIGHT_SCALE);
+        }
 
         left_pwm  *= LEFT_INVERT;
         right_pwm *= RIGHT_INVERT;

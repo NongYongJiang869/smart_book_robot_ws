@@ -85,5 +85,6 @@ def generate_launch_description():
             name='teleop_keyboard',
             output='screen',
             prefix='xterm -e',
+            parameters=[{'speed': 0.2, 'turn': 0.5}],
         ),
     ])

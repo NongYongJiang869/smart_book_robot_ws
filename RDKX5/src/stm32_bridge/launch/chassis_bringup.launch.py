@@ -48,5 +48,6 @@ def generate_launch_description():
             prefix='xterm -e',
             condition=IfCondition(LaunchConfiguration('teleop')),
             remappings=[('/cmd_vel', '/cmd_vel')],
+            parameters=[{'speed': 0.2, 'turn': 0.5}],
         ),
     ])

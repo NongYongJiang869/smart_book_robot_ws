@@ -1585,117 +1585,117 @@ LOAD linker stubs
  .debug_ranges  0x0000000000000818       0x30 build/misc.o
  .debug_ranges  0x0000000000000848       0x20 build/startup_stm32f10x_md.o
 
-.debug_macro    0x0000000000000000     0xce87
- .debug_macro   0x0000000000000000      0x105 build/main.o
- .debug_macro   0x0000000000000105      0xa6c build/main.o
- .debug_macro   0x0000000000000b71       0x5c build/main.o
- .debug_macro   0x0000000000000bcd       0x22 build/main.o
- .debug_macro   0x0000000000000bef      0x34e build/main.o
- .debug_macro   0x0000000000000f3d      0x69f build/main.o
- .debug_macro   0x00000000000015dc     0x7eb3 build/main.o
- .debug_macro   0x000000000000948f      0x2a5 build/main.o
- .debug_macro   0x0000000000009734      0x3e2 build/main.o
- .debug_macro   0x0000000000009b16      0x711 build/main.o
- .debug_macro   0x000000000000a227      0x226 build/main.o
- .debug_macro   0x000000000000a44d       0x8a build/main.o
- .debug_macro   0x000000000000a4d7       0x35 build/main.o
- .debug_macro   0x000000000000a50c       0x10 build/main.o
- .debug_macro   0x000000000000a51c       0x46 build/main.o
- .debug_macro   0x000000000000a562       0xee build/motor.o
- .debug_macro   0x000000000000a650      0x6bd build/motor.o
- .debug_macro   0x000000000000ad0d       0x94 build/bsp_delay.o
- .debug_macro   0x000000000000ada1       0x9a build/bsp_usart.o
- .debug_macro   0x000000000000ae3b       0x94 build/encoder.o
- .debug_macro   0x000000000000aecf      0x17a build/protocol.o
- .debug_macro   0x000000000000b049       0x40 build/protocol.o
- .debug_macro   0x000000000000b089       0x22 build/protocol.o
- .debug_macro   0x000000000000b0ab       0x52 build/protocol.o
- .debug_macro   0x000000000000b0fd       0x18 build/protocol.o
- .debug_macro   0x000000000000b115       0x5c build/protocol.o
- .debug_macro   0x000000000000b171       0x35 build/protocol.o
- .debug_macro   0x000000000000b1a6       0x34 build/protocol.o
- .debug_macro   0x000000000000b1da      0x174 build/protocol.o
- .debug_macro   0x000000000000b34e       0x16 build/protocol.o
- .debug_macro   0x000000000000b364       0x43 build/protocol.o
- .debug_macro   0x000000000000b3a7       0x57 build/protocol.o
- .debug_macro   0x000000000000b3fe       0x34 build/protocol.o
- .debug_macro   0x000000000000b432       0x10 build/protocol.o
- .debug_macro   0x000000000000b442       0x52 build/protocol.o
- .debug_macro   0x000000000000b494      0x182 build/protocol.o
- .debug_macro   0x000000000000b616      0x333 build/protocol.o
- .debug_macro   0x000000000000b949       0x10 build/protocol.o
- .debug_macro   0x000000000000b959       0x35 build/protocol.o
- .debug_macro   0x000000000000b98e       0xee build/mpu6050.o
- .debug_macro   0x000000000000ba7c       0xac build/stm32f10x_it.o
- .debug_macro   0x000000000000bb28       0x9b build/system_stm32f10x.o
- .debug_macro   0x000000000000bbc3       0xe7 build/stm32f10x_gpio.o
- .debug_macro   0x000000000000bcaa      0x3dc build/stm32f10x_gpio.o
- .debug_macro   0x000000000000c086      0x1b5 build/stm32f10x_rcc.o
- .debug_macro   0x000000000000c23b       0xb1 build/stm32f10x_tim.o
- .debug_macro   0x000000000000c2ec      0x70b build/stm32f10x_tim.o
- .debug_macro   0x000000000000c9f7      0x14d build/stm32f10x_usart.o
- .debug_macro   0x000000000000cb44      0x220 build/stm32f10x_usart.o
- .debug_macro   0x000000000000cd64       0x9f build/misc.o
- .debug_macro   0x000000000000ce03       0x84 build/misc.o
+.debug_macro    0x0000000000000000     0xce9f
+ .debug_macro   0x0000000000000000      0x11d build/main.o
+ .debug_macro   0x000000000000011d      0xa6c build/main.o
+ .debug_macro   0x0000000000000b89       0x5c build/main.o
+ .debug_macro   0x0000000000000be5       0x22 build/main.o
+ .debug_macro   0x0000000000000c07      0x34e build/main.o
+ .debug_macro   0x0000000000000f55      0x69f build/main.o
+ .debug_macro   0x00000000000015f4     0x7eb3 build/main.o
+ .debug_macro   0x00000000000094a7      0x2a5 build/main.o
+ .debug_macro   0x000000000000974c      0x3e2 build/main.o
+ .debug_macro   0x0000000000009b2e      0x711 build/main.o
+ .debug_macro   0x000000000000a23f      0x226 build/main.o
+ .debug_macro   0x000000000000a465       0x8a build/main.o
+ .debug_macro   0x000000000000a4ef       0x35 build/main.o
+ .debug_macro   0x000000000000a524       0x10 build/main.o
+ .debug_macro   0x000000000000a534       0x46 build/main.o
+ .debug_macro   0x000000000000a57a       0xee build/motor.o
+ .debug_macro   0x000000000000a668      0x6bd build/motor.o
+ .debug_macro   0x000000000000ad25       0x94 build/bsp_delay.o
+ .debug_macro   0x000000000000adb9       0x9a build/bsp_usart.o
+ .debug_macro   0x000000000000ae53       0x94 build/encoder.o
+ .debug_macro   0x000000000000aee7      0x17a build/protocol.o
+ .debug_macro   0x000000000000b061       0x40 build/protocol.o
+ .debug_macro   0x000000000000b0a1       0x22 build/protocol.o
+ .debug_macro   0x000000000000b0c3       0x52 build/protocol.o
+ .debug_macro   0x000000000000b115       0x18 build/protocol.o
+ .debug_macro   0x000000000000b12d       0x5c build/protocol.o
+ .debug_macro   0x000000000000b189       0x35 build/protocol.o
+ .debug_macro   0x000000000000b1be       0x34 build/protocol.o
+ .debug_macro   0x000000000000b1f2      0x174 build/protocol.o
+ .debug_macro   0x000000000000b366       0x16 build/protocol.o
+ .debug_macro   0x000000000000b37c       0x43 build/protocol.o
+ .debug_macro   0x000000000000b3bf       0x57 build/protocol.o
+ .debug_macro   0x000000000000b416       0x34 build/protocol.o
+ .debug_macro   0x000000000000b44a       0x10 build/protocol.o
+ .debug_macro   0x000000000000b45a       0x52 build/protocol.o
+ .debug_macro   0x000000000000b4ac      0x182 build/protocol.o
+ .debug_macro   0x000000000000b62e      0x333 build/protocol.o
+ .debug_macro   0x000000000000b961       0x10 build/protocol.o
+ .debug_macro   0x000000000000b971       0x35 build/protocol.o
+ .debug_macro   0x000000000000b9a6       0xee build/mpu6050.o
+ .debug_macro   0x000000000000ba94       0xac build/stm32f10x_it.o
+ .debug_macro   0x000000000000bb40       0x9b build/system_stm32f10x.o
+ .debug_macro   0x000000000000bbdb       0xe7 build/stm32f10x_gpio.o
+ .debug_macro   0x000000000000bcc2      0x3dc build/stm32f10x_gpio.o
+ .debug_macro   0x000000000000c09e      0x1b5 build/stm32f10x_rcc.o
+ .debug_macro   0x000000000000c253       0xb1 build/stm32f10x_tim.o
+ .debug_macro   0x000000000000c304      0x70b build/stm32f10x_tim.o
+ .debug_macro   0x000000000000ca0f      0x14d build/stm32f10x_usart.o
+ .debug_macro   0x000000000000cb5c      0x220 build/stm32f10x_usart.o
+ .debug_macro   0x000000000000cd7c       0x9f build/misc.o
+ .debug_macro   0x000000000000ce1b       0x84 build/misc.o
 
-.debug_line     0x0000000000000000     0x5efc
- .debug_line    0x0000000000000000      0x49d build/main.o
- .debug_line    0x000000000000049d      0x2fa build/motor.o
- .debug_line    0x0000000000000797      0x2a8 build/bsp_delay.o
- .debug_line    0x0000000000000a3f      0x352 build/bsp_usart.o
- .debug_line    0x0000000000000d91      0x398 build/encoder.o
- .debug_line    0x0000000000001129      0x66d build/protocol.o
- .debug_line    0x0000000000001796      0x6e4 build/mpu6050.o
- .debug_line    0x0000000000001e7a      0x2ec build/stm32f10x_it.o
- .debug_line    0x0000000000002166      0x3f2 build/system_stm32f10x.o
- .debug_line    0x0000000000002558      0x6e0 build/stm32f10x_gpio.o
- .debug_line    0x0000000000002c38      0x8a2 build/stm32f10x_rcc.o
- .debug_line    0x00000000000034da     0x1a48 build/stm32f10x_tim.o
- .debug_line    0x0000000000004f22      0x8b6 build/stm32f10x_usart.o
- .debug_line    0x00000000000057d8      0x2d1 build/misc.o
- .debug_line    0x0000000000005aa9       0x7a build/startup_stm32f10x_md.o
- .debug_line    0x0000000000005b23       0xd4 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_mulsf3.o)
- .debug_line    0x0000000000005bf7      0x11a /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubsf3.o)
- .debug_line    0x0000000000005d11       0xb1 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_cmpsf2.o)
- .debug_line    0x0000000000005dc2       0x79 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_fixsfsi.o)
- .debug_line    0x0000000000005e3b       0xc1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memcpy.o)
+.debug_line     0x0000000000000000     0x5efd
+ .debug_line    0x0000000000000000      0x49e build/main.o
+ .debug_line    0x000000000000049e      0x2fa build/motor.o
+ .debug_line    0x0000000000000798      0x2a8 build/bsp_delay.o
+ .debug_line    0x0000000000000a40      0x352 build/bsp_usart.o
+ .debug_line    0x0000000000000d92      0x398 build/encoder.o
+ .debug_line    0x000000000000112a      0x66d build/protocol.o
+ .debug_line    0x0000000000001797      0x6e4 build/mpu6050.o
+ .debug_line    0x0000000000001e7b      0x2ec build/stm32f10x_it.o
+ .debug_line    0x0000000000002167      0x3f2 build/system_stm32f10x.o
+ .debug_line    0x0000000000002559      0x6e0 build/stm32f10x_gpio.o
+ .debug_line    0x0000000000002c39      0x8a2 build/stm32f10x_rcc.o
+ .debug_line    0x00000000000034db     0x1a48 build/stm32f10x_tim.o
+ .debug_line    0x0000000000004f23      0x8b6 build/stm32f10x_usart.o
+ .debug_line    0x00000000000057d9      0x2d1 build/misc.o
+ .debug_line    0x0000000000005aaa       0x7a build/startup_stm32f10x_md.o
+ .debug_line    0x0000000000005b24       0xd4 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_mulsf3.o)
+ .debug_line    0x0000000000005bf8      0x11a /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubsf3.o)
+ .debug_line    0x0000000000005d12       0xb1 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_cmpsf2.o)
+ .debug_line    0x0000000000005dc3       0x79 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_fixsfsi.o)
+ .debug_line    0x0000000000005e3c       0xc1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memcpy.o)
 
-.debug_str      0x0000000000000000    0x41fdd
- .debug_str     0x0000000000000000    0x3c032 build/main.o
-                                      0x3c1db (size before relaxing)
- .debug_str     0x000000000003c032      0x5ad build/motor.o
+.debug_str      0x0000000000000000    0x42033
+ .debug_str     0x0000000000000000    0x3c088 build/main.o
+                                      0x3c231 (size before relaxing)
+ .debug_str     0x000000000003c088      0x5ad build/motor.o
                                       0x3c22d (size before relaxing)
- .debug_str     0x000000000003c5df       0x89 build/bsp_delay.o
+ .debug_str     0x000000000003c635       0x89 build/bsp_delay.o
                                       0x3bc82 (size before relaxing)
- .debug_str     0x000000000003c668      0x468 build/bsp_usart.o
+ .debug_str     0x000000000003c6be      0x468 build/bsp_usart.o
                                       0x3c243 (size before relaxing)
- .debug_str     0x000000000003cad0      0x161 build/encoder.o
+ .debug_str     0x000000000003cb26      0x161 build/encoder.o
                                       0x3c426 (size before relaxing)
- .debug_str     0x000000000003cc31     0x2cf9 build/protocol.o
+ .debug_str     0x000000000003cc87     0x2cf9 build/protocol.o
                                       0x3ec3c (size before relaxing)
- .debug_str     0x000000000003f92a      0x26f build/mpu6050.o
+ .debug_str     0x000000000003f980      0x26f build/mpu6050.o
                                       0x3bfff (size before relaxing)
- .debug_str     0x000000000003fb99      0x139 build/stm32f10x_it.o
+ .debug_str     0x000000000003fbef      0x139 build/stm32f10x_it.o
                                       0x3be79 (size before relaxing)
- .debug_str     0x000000000003fcd2      0x16f build/system_stm32f10x.o
+ .debug_str     0x000000000003fd28      0x16f build/system_stm32f10x.o
                                       0x3bd4b (size before relaxing)
- .debug_str     0x000000000003fe41      0x476 build/stm32f10x_gpio.o
+ .debug_str     0x000000000003fe97      0x476 build/stm32f10x_gpio.o
                                       0x3c1cf (size before relaxing)
- .debug_str     0x00000000000402b7      0xabe build/stm32f10x_rcc.o
+ .debug_str     0x000000000004030d      0xabe build/stm32f10x_rcc.o
                                       0x3c79e (size before relaxing)
- .debug_str     0x0000000000040d75      0x8c2 build/stm32f10x_tim.o
+ .debug_str     0x0000000000040dcb      0x8c2 build/stm32f10x_tim.o
                                       0x3c8ea (size before relaxing)
- .debug_str     0x0000000000041637      0x6f5 build/stm32f10x_usart.o
+ .debug_str     0x000000000004168d      0x6f5 build/stm32f10x_usart.o
                                       0x3c508 (size before relaxing)
- .debug_str     0x0000000000041d2c      0x139 build/misc.o
+ .debug_str     0x0000000000041d82      0x139 build/misc.o
                                       0x3be4b (size before relaxing)
- .debug_str     0x0000000000041e65       0x2b build/startup_stm32f10x_md.o
+ .debug_str     0x0000000000041ebb       0x2b build/startup_stm32f10x_md.o
                                          0x4d (size before relaxing)
- .debug_str     0x0000000000041e90       0xa7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_mulsf3.o)
- .debug_str     0x0000000000041f37       0xa7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubsf3.o)
- .debug_str     0x0000000000041f37       0xa7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_cmpsf2.o)
- .debug_str     0x0000000000041f37       0xa7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_fixsfsi.o)
- .debug_str     0x0000000000041f37       0xa6 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memcpy.o)
+ .debug_str     0x0000000000041ee6       0xa7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_mulsf3.o)
+ .debug_str     0x0000000000041f8d       0xa7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubsf3.o)
+ .debug_str     0x0000000000041f8d       0xa7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_cmpsf2.o)
+ .debug_str     0x0000000000041f8d       0xa7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v7-m/nofp/libgcc.a(_arm_fixsfsi.o)
+ .debug_str     0x0000000000041f8d       0xa6 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memcpy.o)
                                          0xb2 (size before relaxing)
 
 .debug_frame    0x0000000000000000     0x1400

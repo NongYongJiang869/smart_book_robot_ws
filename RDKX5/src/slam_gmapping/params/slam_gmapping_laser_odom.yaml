@@ -1,0 +1,63 @@
+/slam_gmapping:
+  ros__parameters:
+    # ── 帧定义 ──
+    base_frame: base_footprint
+    map_frame: map
+    odom_frame: odom_laser        # rf2o 激光里程计帧
+
+    # ── 扫描匹配 ──
+    particles: 30                # 激光里程计精度高, 30个粒子足够
+    iterations: 5                # 扫描匹配迭代
+    minimum_score: 300.0         # 最小匹配分数
+    lsigma: 0.075
+    ogain: 3.0
+    lskip: 0
+    kernelSize: 1
+    delta: 0.05
+    sigma: 0.05
+    lstep: 0.05
+    astep: 0.05
+
+    # ── 运动模型噪声 (激光里程计精度高→噪声极小) ──
+    srr: 0.005                   # 原 0.1, 激光odo平移误差极小
+    srt: 0.01                    # 原 0.2
+    str: 0.005                   # 原 0.1
+    stt: 0.01                    # 原 0.2
+
+    # ── 更新频率 ──
+    linearUpdate: 0.1            # 每 0.1m 移动更新
+    angularUpdate: 0.05          # 每 0.05rad 旋转更新
+    temporalUpdate: 0.1          # 最小更新间隔 (0.3→0.1)
+    map_update_interval: 0.5     # 地图发布间隔 (1.0→0.5)
+    transform_publish_period: 0.05
+
+    # ── 激光参数 ──
+    maxRange: 8.0                # 最大使用距离 (室内可到8m)
+    maxUrange: 6.0               # 可靠使用距离
+    lasamplerange: 0.005
+    lasamplestep: 0.005
+    llsamplerange: 0.01
+    llsamplestep: 0.01
+
+    # ── 其他 ──
+    occ_thresh: 0.25
+    resampleThreshold: 0.5
+    use_sim_time: false
+    xmax: 20.0
+    xmin: -20.0
+    ymax: 20.0
+    ymin: -20.0
+
+    qos_overrides:
+      /parameter_events:
+        publisher:
+          depth: 1000
+          durability: volatile
+          history: keep_all
+          reliability: reliable
+      /tf:
+        publisher:
+          depth: 1000
+          durability: volatile
+          history: keep_last
+          reliability: reliable
