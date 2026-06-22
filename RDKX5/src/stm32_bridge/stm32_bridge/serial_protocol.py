@@ -180,9 +180,9 @@ class SerialProtocol:
             'right_enc': right_enc,
             'left_wheel_v': lv,
             'right_wheel_v': rv,
-            'gyro_z_dps': gyro / 1000.0,
-            'accel_x': acc_x / 1000.0,
-            'accel_y': acc_y / 1000.0,
+            'gyro_z_dps': gyro / 131.0,       # LSB→°/s  (±250°/s量程)
+            'accel_x': acc_x / 16384.0 * 9.807,  # LSB→m/s² (±2g量程)
+            'accel_y': acc_y / 16384.0 * 9.807,
             'timestamp_ms': ts,
         }
 

@@ -22,7 +22,7 @@
 /* ── 运动学参数 ── */
 #define MAX_PWM            999     /* PWM 最大值 (0~999) */
 #define MAX_LINEAR_SPEED   0.5f    /* 最大线速度 m/s (与 ROS2 侧一致) */
-#define MAX_ANGULAR_SPEED  1.0f    /* 最大角速度 rad/s */
+#define MAX_ANGULAR_SPEED  2.0f    /* 最大角速度 rad/s */
 #define WHEEL_BASE         0.35f   /* 左右轮间距 (m) — 需实测标定 */
 
 /* ── 单轮 PWM 补偿 (直接在 PWM 层面修正机械不平衡) ── */
@@ -122,7 +122,7 @@ int main(void)
     bsp_usart2_init();
     encoder_init();
     protocol_init();
-    mpu6050_init();         /* I2C2: PB10=SCL, PB11=SDA */
+    mpu6050_init();         /* 硬件 I2C1 remap → PB8=SCL, PB9=SDA */
 
     /* 启动诊断: 通过串口输出 MPU6050 状态
      * 用二进制帧查看不方便, 这里直接发 ASCII 到串口供调试 */
@@ -133,7 +133,7 @@ int main(void)
     }
     else
     {
-        USART_SendData(USART2, 'X');  /* X = MPU6050 FAIL (检查 PB10/PB11 上拉电阻) */
+        USART_SendData(USART2, 'X');  /* X = MPU6050 FAIL (检查 PB8/PB9 接线和上拉) */
     }
 
     uint32_t last_odom      = 0;
@@ -183,6 +183,15 @@ int main(void)
         if (mpu6050_read(&gyro_z, &accel_x, &accel_y) != 0)
         {
             gyro_z = 0; accel_x = 0; accel_y = 0;
+        }
+
+        /* ── 运行时偏置跟踪: 静止时修正陀螺零偏 ── */
+        {
+            int    no_cmd   = (cmd_received == 0);
+            int32_t ls      = encoder_get_left_speed();
+            int32_t rs      = encoder_get_right_speed();
+            int    wheels_stopped = (ls < 100 && ls > -100 && rs < 100 && rs > -100);
+            mpu6050_track_bias(no_cmd && wheels_stopped);
         }
 
         /* ── 执行速度指令 ── */

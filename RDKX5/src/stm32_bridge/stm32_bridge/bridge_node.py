@@ -29,7 +29,8 @@ from sensor_msgs.msg import Imu
 from custom_interfaces.msg import ChassisStatus
 
 from .serial_protocol import SerialProtocol
-from .odometry import OdometryComputer, quaternion_from_yaw
+from .odometry import OdometryComputer, CalibrationMonitor, quaternion_from_yaw
+from custom_interfaces.srv import CalibrateWheelBase
 
 
 # ── QoS 策略 (同设计文档 04) ──
@@ -60,11 +61,11 @@ class STM32BridgeNode(Node):
             parameters=[
                 ('serial_port', '/dev/ttyS1'),
                 ('baud_rate', 115200),
-                ('wheel_circumference', 0.478),
+                ('wheel_circumference', 0.241),
                 ('wheel_base', 0.35),
                 ('counts_per_rev', 1560),
                 ('max_linear_vel', 0.5),
-                ('max_angular_vel', 1.0),
+                ('max_angular_vel', 2.0),
                 ('cmd_timeout_ms', 200),
                 ('odom_frame', 'odom'),
                 ('base_frame', 'base_link'),
@@ -89,6 +90,7 @@ class STM32BridgeNode(Node):
         wb = self.get_parameter('wheel_base').value
         cpr = self.get_parameter('counts_per_rev').value
         self.odom_comp = OdometryComputer(wc, wb, cpr)
+        self.calib = CalibrationMonitor(wb)
 
         # ── 发布者 ──
         self.odom_pub = self.create_publisher(Odometry, '/odom', QOS_SENSOR)
@@ -99,6 +101,10 @@ class STM32BridgeNode(Node):
         # ── 订阅者 ──
         self.cmd_sub = self.create_subscription(
             Twist, '/cmd_vel', self._cmd_callback, 10)
+
+        # ── 服务 ──
+        self.calib_srv = self.create_service(
+            CalibrateWheelBase, '/calibrate_wheel_base', self._calib_callback)
 
         # ── TF 广播 ──
         from tf2_ros import TransformBroadcaster
@@ -140,6 +146,43 @@ class STM32BridgeNode(Node):
         self._last_cmd_time = self.get_clock().now()
 
     # ============================================================
+    # 标定服务
+    # ============================================================
+
+    def _calib_callback(self, request, response):
+        """处理 /calibrate_wheel_base 服务请求"""
+        if request.start:
+            self.calib.start()
+            self.get_logger().info(
+                '轮距标定已开始 — 请遥控小车原地旋转 (建议正反转各几圈, 累计 ≥360°)')
+            response.success = True
+            response.message = (
+                f'标定已开始 (当前 wheel_base={self.calib.wheel_base_nominal:.3f}m), '
+                '请原地旋转小车, 完成后再次调用此服务 (start=false)')
+            response.calibrated_wheel_base = 0.0
+            response.correction_factor = 0.0
+            response.sample_count = 0
+            response.encoder_yaw_deg = 0.0
+            response.gyro_yaw_deg = 0.0
+        else:
+            ok, msg = self.calib.stop()
+            if ok:
+                self.get_logger().info(
+                    f'轮距标定完成: wheel_base={self.calib.result_wheel_base:.4f}m '
+                    f'(修正系数 {self.calib.result_factor:.4f}, '
+                    f'原值 {self.calib.wheel_base_nominal:.3f}m)')
+            else:
+                self.get_logger().warn(f'轮距标定失败: {msg}')
+            response.success = ok
+            response.message = msg
+            response.calibrated_wheel_base = self.calib.result_wheel_base or 0.0
+            response.correction_factor = self.calib.result_factor or 0.0
+            response.sample_count = self.calib.sample_count
+            response.encoder_yaw_deg = math.degrees(self.calib.encoder_yaw_total)
+            response.gyro_yaw_deg = math.degrees(self.calib.gyro_yaw_total)
+        return response
+
+    # ============================================================
     # 发送循环 (100Hz)
     # ============================================================
 
@@ -164,12 +207,15 @@ class STM32BridgeNode(Node):
     # ============================================================
 
     def _read_loop(self):
-        """读取串口数据, 解析帧, 发布话题"""
+        """读取串口数据, 解析帧, 发布话题
+
+        注意: 不使用 in_waiting + read(n) 模式, 因为两者之间存在竞态条件,
+        会导致 "reports readiness but returned no data" 错误.
+        直接用 read() 读取, 空返回说明本周期无数据, 不报错.
+        """
         try:
-            # 读取所有可用数据
-            n = self.ser.in_waiting
-            if n > 0:
-                data = self.ser.read(n)
+            data = self.ser.read(256)
+            if data:
                 self._process_data(data)
         except serial.SerialException as e:
             self.get_logger().error(f'串口读取失败: {e}')
@@ -216,7 +262,17 @@ class STM32BridgeNode(Node):
         # ── 里程计 ──
         dt = 1.0 / self.get_parameter('publish_rate').value
         vx, vth, dyaw = self.odom_comp.update(
-            d['left_enc'], d['right_enc'], dt)
+            d['left_enc'], d['right_enc'], dt,
+            gyro_z_dps=d['gyro_z_dps'])  # 陀螺角速度 → 免疫轮子打滑
+
+        # ── 轮距标定数据采集 ──
+        if self.calib.active:
+            self.calib.feed(
+                dyaw,                              # 编码器 yaw 增量 (rad)
+                d['gyro_z_dps'],                   # 陀螺 Z (°/s)
+                dt,
+                self.odom_comp.last_d_left_m,      # 左轮位移 (m)
+                self.odom_comp.last_d_right_m)      # 右轮位移 (m)
 
         q = quaternion_from_yaw(self.odom_comp.yaw)
 

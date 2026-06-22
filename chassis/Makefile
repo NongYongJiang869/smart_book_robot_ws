@@ -28,7 +28,7 @@ CFLAGS := $(CPU_FLAGS) $(DEFS) $(INCLUDES) -std=c11 -Wall -Wextra -Og -g3 -ffunc
 ASFLAGS := $(CPU_FLAGS) -x assembler-with-cpp -g3
 
 LDSCRIPT := ld/stm32f103c8t6.ld
-LDFLAGS := $(CPU_FLAGS) -T$(LDSCRIPT) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map -Wl,--gc-sections --specs=nano.specs --specs=nosys.specs
+LDFLAGS := $(CPU_FLAGS) -T$(LDSCRIPT) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map -Wl,--gc-sections --specs=nano.specs --specs=nosys.specs -lm
 
 PROJECT_C_SOURCES := \
 	src/main.c \
@@ -46,6 +46,7 @@ SPL_C_SOURCES := \
 	$(SPL_DIR)/src/stm32f10x_rcc.c \
 	$(SPL_DIR)/src/stm32f10x_tim.c \
 	$(SPL_DIR)/src/stm32f10x_usart.c \
+	$(SPL_DIR)/src/stm32f10x_i2c.c \
 	$(SPL_DIR)/src/misc.c
 
 ASM_SOURCES := startup/startup_stm32f10x_md.s

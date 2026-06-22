@@ -172,7 +172,14 @@ int32_t encoder_get_left_speed(void)
 
 int32_t encoder_get_right_speed(void)
 {
-    return g_right_speed;
+    /*
+     * 方向校正:
+     *   右路电机与左路电机物理镜像安装。前进时右电机需要反向旋转,
+     *   因此 main.c 中 RIGHT_INVERT = -1 对 PWM 做了反转。
+     *   编码器跟随电机物理转向, 读数也是反向的 — 这里取反以保证:
+     *   "前进时 left 和 right encoder 都为正" (与 encoder.h 约定一致)
+     */
+    return -g_right_speed;
 }
 
 int32_t encoder_get_left_total(void)
@@ -182,5 +189,6 @@ int32_t encoder_get_left_total(void)
 
 int32_t encoder_get_right_total(void)
 {
-    return g_right_total;
+    /* 同上: 右路编码器方向校正, 保证前进时两侧累加都为正 */
+    return -g_right_total;
 }

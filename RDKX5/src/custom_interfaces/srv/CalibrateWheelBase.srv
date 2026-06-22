@@ -1,0 +1,21 @@
+# 轮距自动标定服务
+#
+# 使用方法:
+#   ros2 service call /calibrate_wheel_base custom_interfaces/srv/CalibrateWheelBase "{start: true}"
+#   → 遥控小车原地旋转几圈
+#   ros2 service call /calibrate_wheel_base custom_interfaces/srv/CalibrateWheelBase "{start: false}"
+#   → 返回标定结果
+#
+# start=true  → 开始标定, 清零累计值
+# start=false → 结束标定, 返回修正后的 wheel_base
+
+bool start
+
+---
+bool   success              # 标定是否成功 (达到最低样本/角度要求)
+float64 calibrated_wheel_base # 修正后的 wheel_base (m)
+float64 correction_factor   # 修正系数 = 编码器偏航/陀螺仪偏航
+int32   sample_count        # 有效样本数
+float64 encoder_yaw_deg     # 编码器累计偏航 (°)
+float64 gyro_yaw_deg        # 陀螺仪累计偏航 (°)
+string  message             # 状态信息

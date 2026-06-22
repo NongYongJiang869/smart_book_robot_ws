@@ -15,8 +15,13 @@ set(msg_files
   "msg/RobotStatus.msg"
 )
 
+set(srv_files
+  "srv/CalibrateWheelBase.srv"
+)
+
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${msg_files}
+  ${srv_files}
   DEPENDENCIES std_msgs builtin_interfaces
 )
 
