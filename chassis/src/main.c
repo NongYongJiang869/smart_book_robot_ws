@@ -107,6 +107,13 @@ static void set_motors(int16_t left_pwm, int16_t right_pwm)
     if (spd_l < 10) spd_l = 0;
     if (spd_r < 10) spd_r = 0;
 
+    /* 重车最低有效 PWM: 低于此值轮胎不转 (克服静摩擦)
+     * 线速度 <0.05m/s → PWM<100 → 车不动 → 抬升到 120
+     * 角速度 <0.5rad/s → PWM<175 → 车不转 → 由 Nav2 min_speed_theta 保证 */
+    #define MIN_EFFECTIVE_PWM  120
+    if (spd_l > 0 && spd_l < MIN_EFFECTIVE_PWM) spd_l = MIN_EFFECTIVE_PWM;
+    if (spd_r > 0 && spd_r < MIN_EFFECTIVE_PWM) spd_r = MIN_EFFECTIVE_PWM;
+
     motor_set(MOTOR_LEFT,  dir_l, spd_l);
     motor_set(MOTOR_RIGHT, dir_r, spd_r);
 }

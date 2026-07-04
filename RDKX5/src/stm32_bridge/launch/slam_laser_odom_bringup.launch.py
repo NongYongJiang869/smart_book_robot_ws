@@ -30,7 +30,6 @@ def generate_launch_description():
 
     stm32_params = os.path.join(stm32_dir, 'config', 'stm32_params.yaml')
     lidar_params = os.path.join(stm32_dir, 'config', 'lidar_params.yaml')
-    ekf_params   = os.path.join(stm32_dir, 'config', 'ekf_params.yaml')
     slam_params  = os.path.join(slam_dir, 'params', 'slam_gmapping_laser_odom.yaml')
 
     use_chassis = LaunchConfiguration('use_chassis', default='false')
@@ -60,7 +59,7 @@ def generate_launch_description():
             parameters=[lidar_params],
         ),
 
-        # ── RF2O 激光里程计 (/odom_rf2o, 不发布 TF 交给 EKF) ──
+        # ── RF2O 激光里程计 (直接发布 TF) ──
         Node(
             package='rf2o_laser_odometry',
             executable='rf2o_laser_odometry_node',
@@ -69,21 +68,12 @@ def generate_launch_description():
             parameters=[{
                 'laser_scan_topic': '/scan',
                 'odom_topic': '/odom_rf2o',
-                'publish_tf': False,          # ← 关闭, 由 EKF 接管 TF
+                'publish_tf': True,           # ← 直接发布 odom_laser→base_footprint
                 'base_frame_id': 'base_footprint',
                 'odom_frame_id': 'odom_laser',
                 'init_pose_from_topic': '',
-                'freq': 15.0,             # ≥ LiDAR 12Hz, 确保不丢扫描帧
+                'freq': 15.0,
             }],
-        ),
-
-        # ── EKF 融合 (rf2o + 陀螺 → /odom_fused + TF) ──
-        Node(
-            package='robot_localization',
-            executable='ekf_node',
-            name='ekf_filter_node',
-            output='screen',
-            parameters=[ekf_params],
         ),
 
         # ── slam_gmapping (map→odom TF + /map) ──
