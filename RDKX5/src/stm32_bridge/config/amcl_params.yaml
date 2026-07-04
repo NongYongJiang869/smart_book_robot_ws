@@ -1,0 +1,51 @@
+/amcl:
+  ros__parameters:
+    # ── 帧定义 (匹配 rf2o 激光里程计) ──
+    odom_frame_id: odom_laser
+    base_frame_id: base_footprint
+    global_frame_id: map
+
+    # ── 滤波器 ──
+    min_particles: 100
+    max_particles: 2000
+    pf_err: 0.025              # 误差增大时增加粒子
+    pf_z: 0.99                 # 高 = 更信任观测
+    recovery_alpha_slow: 0.001 # 慢恢复权重
+    recovery_alpha_fast: 0.1   # 快恢复权重
+
+    # ── 初始位姿 (设默认值, AMCL启动后直接开始定位) ──
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
+
+    # ── 激光模型 (likelihood_field 比 beam 更快更鲁棒) ──
+    laser_model_type: likelihood_field
+    laser_min_range: 0.1
+    laser_max_range: 8.0
+    laser_likelihood_max_dist: 2.0
+    laser_lambda_short: 0.1
+    laser_sigma_hit: 0.2
+    laser_z_hit: 0.95
+    laser_z_rand: 0.05
+
+    # ── 里程计模型 (激光里程计: 噪声很小) ──
+    odom_model_type: diff-corrected
+    alpha1: 0.01               # 平移噪声(平移)
+    alpha2: 0.01               # 平移噪声(旋转)
+    alpha3: 0.02               # 旋转噪声(平移)
+    alpha4: 0.02               # 旋转噪声(旋转)
+
+    # ── 重采样 ──
+    resample_interval: 1
+    selective_resampling: true
+    update_min_d: 0.05         # 0.05m移动才更新
+    update_min_a: 0.05         # 0.05rad旋转才更新
+
+    # ── 发布 ──
+    publish_pose: true
+    use_map_topic: true
+    first_map_only: false
+    transform_tolerance: 0.5

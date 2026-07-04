@@ -1,12 +1,17 @@
 """
-SLAM 建图启动 — LiDAR + 底盘 + gmapping
+SLAM 建图启动 — LiDAR + 底盘 + gmapping (轮式里程计)
 
 用法:
   ros2 launch stm32_bridge slam_bringup.launch.py
+  ros2 launch stm32_bridge slam_bringup.launch.py use_rviz:=true
+
+键盘遥控请在新终端手动运行:
+  ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p speed:=0.2 -p turn:=0.5
 """
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, LogInfo
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
@@ -22,7 +27,19 @@ def generate_launch_description():
     lidar_params = os.path.join(stm32_dir, 'config', 'lidar_params.yaml')
     slam_params  = os.path.join(slam_dir, 'params', 'slam_gmapping.yaml')
 
+    use_rviz = LaunchConfiguration('use_rviz', default='false')
+
     return LaunchDescription([
+        DeclareLaunchArgument(
+            'use_rviz',
+            default_value='false',
+            description='是否启动 RViz2 (需要 X11 显示环境)'),
+
+        # ── 提示键盘遥控 ──
+        LogInfo(msg='💡 建图请在【新终端】中运行键盘控制:'),
+        LogInfo(msg='   ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p speed:=0.05 -p turn:=0.5'),
+        LogInfo(msg='   按键: i=前进 j=左转 l=右转 k=停止 q/z=加减速 w/x=加减转向'),
+
         # ── STM32 底盘桥接 (odometry) ──
         Node(
             package='stm32_bridge',
@@ -55,6 +72,7 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             name='static_tf_footprint',
+            output='screen',
             arguments=['--x', '0', '--y', '0', '--z', '0.076',
                        '--frame-id', 'base_footprint',
                        '--child-frame-id', 'base_link'],
@@ -65,26 +83,19 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             name='static_tf_laser',
+            output='screen',
             arguments=['--x', '0.12', '--y', '0', '--z', '0.15',
                        '--frame-id', 'base_link',
                        '--child-frame-id', 'laser_frame'],
         ),
 
-        # ── RViz2 (X11 转发到 MobaXterm) ──
+        # ── RViz2 (可选, 需要 X11 DISPLAY) ──
         Node(
             package='rviz2',
             executable='rviz2',
             name='rviz2',
             output='screen',
-        ),
-
-        # ── 键盘遥控 (xterm 窗口) ──
-        Node(
-            package='teleop_twist_keyboard',
-            executable='teleop_twist_keyboard',
-            name='teleop_keyboard',
-            output='screen',
-            prefix='xterm -e',
-            parameters=[{'speed': 0.2, 'turn': 0.5}],
+            arguments=['-d', os.path.join(stm32_dir, 'config', 'map_view.rviz')],
+            condition=IfCondition(use_rviz),
         ),
     ])

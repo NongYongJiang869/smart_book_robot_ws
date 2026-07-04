@@ -57,8 +57,11 @@ void SlamGmapping::init() {
     gsp_odom_ = nullptr;
     got_first_scan_ = false; //false
     got_map_ = false;
+    last_map_update_ = tf2::TimePointZero;
 
+    // ── 硬编码默认值 (兼容无参数文件启动) ──
     throttle_scans_ = 1;
+    queue_size_    = 100;
     base_frame_ = "base_link";
     map_frame_ = "map";
     odom_frame_ = "odom";
@@ -95,6 +98,94 @@ void SlamGmapping::init() {
     lasamplerange_ = 0.005;
     lasamplestep_ = 0.005;
     tf_delay_ = transform_publish_period_;
+
+    // ── 声明 ROS 参数 (允许 YAML 文件覆盖) ──
+    this->declare_parameter("throttle_scans", throttle_scans_);
+    this->declare_parameter("queue_size", queue_size_);
+    this->declare_parameter("base_frame", base_frame_);
+    this->declare_parameter("map_frame", map_frame_);
+    this->declare_parameter("odom_frame", odom_frame_);
+    this->declare_parameter("transform_publish_period", transform_publish_period_);
+    this->declare_parameter("map_update_interval", 0.5);
+    this->declare_parameter("maxUrange", maxUrange_);
+    this->declare_parameter("maxRange", maxRange_);
+    this->declare_parameter("minimum_score", minimum_score_);
+    this->declare_parameter("sigma", sigma_);
+    this->declare_parameter("kernelSize", kernelSize_);
+    this->declare_parameter("lstep", lstep_);
+    this->declare_parameter("astep", astep_);
+    this->declare_parameter("iterations", iterations_);
+    this->declare_parameter("lsigma", lsigma_);
+    this->declare_parameter("ogain", ogain_);
+    this->declare_parameter("lskip", lskip_);
+    this->declare_parameter("srr", srr_);
+    this->declare_parameter("srt", srt_);
+    this->declare_parameter("str", str_);
+    this->declare_parameter("stt", stt_);
+    this->declare_parameter("linearUpdate", linearUpdate_);
+    this->declare_parameter("angularUpdate", angularUpdate_);
+    this->declare_parameter("temporalUpdate", temporalUpdate_);
+    this->declare_parameter("resampleThreshold", resampleThreshold_);
+    this->declare_parameter("particles", particles_);
+    this->declare_parameter("xmin", xmin_);
+    this->declare_parameter("ymin", ymin_);
+    this->declare_parameter("xmax", xmax_);
+    this->declare_parameter("ymax", ymax_);
+    this->declare_parameter("delta", delta_);
+    this->declare_parameter("occ_thresh", occ_thresh_);
+    this->declare_parameter("llsamplerange", llsamplerange_);
+    this->declare_parameter("llsamplestep", llsamplestep_);
+    this->declare_parameter("lasamplerange", lasamplerange_);
+    this->declare_parameter("lasamplestep", lasamplestep_);
+    this->declare_parameter("tf_delay", tf_delay_);
+
+    // ── 读取 ROS 参数 (用 YAML 值覆盖硬编码默认值) ──
+    this->get_parameter("throttle_scans", throttle_scans_);
+    this->get_parameter("queue_size", queue_size_);
+    this->get_parameter("base_frame", base_frame_);
+    this->get_parameter("map_frame", map_frame_);
+    this->get_parameter("odom_frame", odom_frame_);
+    this->get_parameter("transform_publish_period", transform_publish_period_);
+    double map_update_sec;
+    this->get_parameter("map_update_interval", map_update_sec);
+    map_update_interval_ = tf2::durationFromSec(map_update_sec);
+    this->get_parameter("maxUrange", maxUrange_);
+    this->get_parameter("maxRange", maxRange_);
+    this->get_parameter("minimum_score", minimum_score_);
+    this->get_parameter("sigma", sigma_);
+    this->get_parameter("kernelSize", kernelSize_);
+    this->get_parameter("lstep", lstep_);
+    this->get_parameter("astep", astep_);
+    this->get_parameter("iterations", iterations_);
+    this->get_parameter("lsigma", lsigma_);
+    this->get_parameter("ogain", ogain_);
+    this->get_parameter("lskip", lskip_);
+    this->get_parameter("srr", srr_);
+    this->get_parameter("srt", srt_);
+    this->get_parameter("str", str_);
+    this->get_parameter("stt", stt_);
+    this->get_parameter("linearUpdate", linearUpdate_);
+    this->get_parameter("angularUpdate", angularUpdate_);
+    this->get_parameter("temporalUpdate", temporalUpdate_);
+    this->get_parameter("resampleThreshold", resampleThreshold_);
+    this->get_parameter("particles", particles_);
+    this->get_parameter("xmin", xmin_);
+    this->get_parameter("ymin", ymin_);
+    this->get_parameter("xmax", xmax_);
+    this->get_parameter("ymax", ymax_);
+    this->get_parameter("delta", delta_);
+    this->get_parameter("occ_thresh", occ_thresh_);
+    this->get_parameter("llsamplerange", llsamplerange_);
+    this->get_parameter("llsamplestep", llsamplestep_);
+    this->get_parameter("lasamplerange", lasamplerange_);
+    this->get_parameter("lasamplestep", lasamplestep_);
+    this->get_parameter("tf_delay", tf_delay_);
+
+    RCLCPP_INFO(this->get_logger(),
+        "slam_gmapping params: base_frame=%s, odom_frame=%s, particles=%d, queue_size=%d, "
+        "map_update_interval=%.2fs, maxUrange=%.1f",
+        base_frame_.c_str(), odom_frame_.c_str(), particles_, queue_size_,
+        map_update_sec, maxUrange_);
 }
 
 void SlamGmapping::startLiveSlam() {
@@ -107,7 +198,7 @@ void SlamGmapping::startLiveSlam() {
 //        "scan", rclcpp::SensorDataQoS(),
 //        std::bind(&SlamGmapping::laserCallback, this, std::placeholders::_1));
     scan_filter_ = std::make_shared<tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>>
-            (*scan_filter_sub_, *buffer_, odom_frame_, 10, node_);
+            (*scan_filter_sub_, *buffer_, odom_frame_, static_cast<uint32_t>(queue_size_), node_);
     scan_filter_->registerCallback(std::bind(&SlamGmapping::laserCallback, this, std::placeholders::_1));
     transform_thread_ = std::make_shared<std::thread>
             (std::bind(&SlamGmapping::publishLoop, this, transform_publish_period_));
@@ -354,14 +445,13 @@ void SlamGmapping::laserCallback(sensor_msgs::msg::LaserScan::ConstSharedPtr sca
     if ((laser_count_ % throttle_scans_) != 0)
         return;
 
-    tf2::TimePoint last_map_update = tf2::TimePointZero;
-
     // We can't initialize the mapper until we've got the first scan
     if(!got_first_scan_)
     {
         if(!initMapper(scan))
             return;
         got_first_scan_ = true;
+        last_map_update_ = tf2::TimePointZero;
     }
 
     GMapping::OrientedPoint odom_pose;
@@ -381,10 +471,10 @@ void SlamGmapping::laserCallback(sensor_msgs::msg::LaserScan::ConstSharedPtr sca
         map_to_odom_mutex_.unlock();
 
         tf2::TimePoint timestamp = tf2_ros::fromMsg(scan->header.stamp);
-        if(!got_map_ || (timestamp - last_map_update) > map_update_interval_)
+        if(!got_map_ || (timestamp - last_map_update_) > map_update_interval_)
         {
             updateMap(scan);
-            last_map_update = tf2_ros::fromMsg(scan->header.stamp);
+            last_map_update_ = tf2_ros::fromMsg(scan->header.stamp);
         }
     }
 }

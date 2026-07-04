@@ -96,6 +96,8 @@ private:
 
     int laser_count_;
     int throttle_scans_;
+    int queue_size_;
+    tf2::TimePoint last_map_update_;
 
     std::shared_ptr<std::thread> transform_thread_;
 

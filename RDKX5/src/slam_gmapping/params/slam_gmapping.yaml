@@ -5,9 +5,13 @@
     map_frame: map
     odom_frame: odom
 
+    # ── 消息过滤器 ──
+    queue_size: 100             # TF消息过滤器队列 (默认10太小, 易丢帧)
+    throttle_scans: 1           # 扫描节流 (1=不丢帧)
+
     # ── 扫描匹配精度 ──
-    particles: 80               # 粒子数 (30→80, 更稳定但更吃CPU)
-    iterations: 10              # 扫描匹配迭代 (5→10)
+    particles: 30               # 粒子数 (80→30, 降低CPU, 轮式里程计够用)
+    iterations: 5               # 扫描匹配迭代 (10→5)
     minimum_score: 50.0         # 最小匹配分数 (0→50, 拒绝低质量匹配)
     lsigma: 0.075
     ogain: 3.0
@@ -25,10 +29,10 @@
     stt: 0.2                    # 旋转噪声(旋转→旋转)
 
     # ── 更新频率 ──
-    linearUpdate: 0.5           # 每0.5m移动更新 (1.0→0.5, 更频繁)
-    angularUpdate: 0.3          # 每0.3rad旋转更新 (0.5→0.3)
-    temporalUpdate: 0.5         # 最小更新间隔 (1.0→0.5)
-    map_update_interval: 3.0    # 地图发布间隔 (5.0→3.0)
+    linearUpdate: 0.1           # 每0.1m移动更新 (避免odom跳跃过大)
+    angularUpdate: 0.1          # 每0.1rad旋转更新
+    temporalUpdate: 0.1         # 最小更新间隔 (高频处理, 防丢帧)
+    map_update_interval: 1.0    # 地图发布间隔
     transform_publish_period: 0.05
 
     # ── 激光参数 ──

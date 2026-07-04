@@ -1,6 +1,6 @@
 stm32_bridge:
   ros__parameters:
-    base_frame: base_link
+    base_frame: base_footprint    # odom→base_footprint, 静态TF处理 base_footprint→base_link
     baud_rate: 115200
     cmd_rate: 100.0
     cmd_timeout_ms: 200
@@ -8,7 +8,9 @@ stm32_bridge:
     max_angular_vel: 2.0
     max_linear_vel: 0.5
     odom_frame: odom
+    publish_odom_tf: true      # 设为false可在激光里程计模式中关闭TF
+    reverse_motors: false     # 设为true反转电机方向
     publish_rate: 50.0
     serial_port: /dev/ttyS1
-    wheel_base: 0.2692
+    wheel_base: 0.15     # 实测95.5°/90°, 误差~6%, SLAM可纠正
     wheel_circumference: 0.241

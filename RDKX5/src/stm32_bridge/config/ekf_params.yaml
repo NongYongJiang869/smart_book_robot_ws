@@ -1,0 +1,78 @@
+# robot_localization EKF — 融合 rf2o 激光里程计 + MPU6050 陀螺仪
+# 输出 /odom_fused, 替代裸的 rf2o 里程计
+ekf_filter_node:
+  ros__parameters:
+    frequency: 30.0
+    sensor_timeout: 0.1
+    two_d_mode: true
+
+    # 坐标系
+    map_frame: map
+    odom_frame: odom_laser
+    base_link_frame: base_footprint
+    world_frame: odom_laser
+
+    # 发布 odom_laser → base_footprint 的 TF (取代 rf2o 自带的 TF)
+    publish_tf: true
+
+    # 发布加速度偏差 (调试用)
+    publish_acceleration: false
+
+    # 打印诊断日志
+    print_diagnostics: false
+
+    # 加速度偏差相关 (不使用加速度, 忽略)
+    imu0_remove_gravitational_acceleration: false
+
+    # ---- 输入 0: rf2o 激光里程计 ----
+    odom0: /odom_rf2o
+    odom0_config:
+      # x y z  rx ry rz  vx vy vz  wx wy wz  ax ay az
+      [true, true, false,   # 使用 x, y (2D 位置)
+       false, false, true,  # 仅 yaw (2D 朝向)
+       true, false, false,   # 仅 vx
+       false, false, true,  # 仅 vyaw
+       false, false, false] # 不使用加速度
+    odom0_differential: false
+    odom0_relative: false
+    odom0_queue_size: 50
+    # rf2o 方差: 位置可信, 朝向偶尔跳变 → yaw/yaw_rate 方差设大, EKF 会倾向信陀螺
+    odom0_pose_covariance: [0.05, 0.0,   0.0, 0.0,   0.0, 0.0,
+                             0.0,  0.05,  0.0, 0.0,   0.0, 0.0,
+                             0.0,  0.0,   0.0, 0.0,   0.0, 0.0,
+                             0.0,  0.0,   0.0, 0.0,   0.0, 0.0,
+                             0.0,  0.0,   0.0, 0.0,   0.0, 0.0,
+                             0.0,  0.0,   0.0, 0.0,   0.0, 0.5]   # yaw 方差大 = 不信任 rf2o 的朝向
+
+    # ---- 输入 1: MPU6050 陀螺仪 ----
+    imu0: /imu
+    imu0_config:
+      # 仅使用 Z 轴角速度 (陀螺最可靠)
+      [false, false, false,
+       false, false, false,
+       false, false, false,
+       false, false, true,   # ← 只有这一项: 陀螺 Z 角速度
+       false, false, false]
+    imu0_differential: false
+    imu0_relative: false
+    imu0_queue_size: 50
+    imu0_pose_rejection_threshold: 0.8
+
+    # 陀螺数据已经由 stm32_bridge 发布, 不加协方差的 override
+    # EKF 使用 /imu 消息自带的 covariance (全 0 时用内部默认)
+
+    # ---- 过程噪声: 越小 → 越信任运动模型预测 ----
+    process_noise_covariance: [0.05, 0.0,   0.0, 0.0,   0.0, 0.0,
+                                0.0,  0.05,  0.0, 0.0,   0.0, 0.0,
+                                0.0,  0.0,   0.0, 0.0,   0.0, 0.0,
+                                0.0,  0.0,   0.0, 0.0,   0.0, 0.0,
+                                0.0,  0.0,   0.0, 0.0,   0.0, 0.0,
+                                0.0,  0.0,   0.0, 0.0,   0.0, 0.1]
+
+    # ---- 初始估计: 小值 = 相信从 0 开始 ----
+    initial_estimate_covariance: [1e-9, 0.0,  0.0, 0.0,  0.0, 0.0,
+                                   0.0,  1e-9, 0.0, 0.0,  0.0, 0.0,
+                                   0.0,  0.0,  0.0, 0.0,  0.0, 0.0,
+                                   0.0,  0.0,  0.0, 0.0,  0.0, 0.0,
+                                   0.0,  0.0,  0.0, 0.0,  0.0, 0.0,
+                                   0.0,  0.0,  0.0, 0.0,  0.0, 1e-9]

@@ -67,8 +67,10 @@ class STM32BridgeNode(Node):
                 ('max_linear_vel', 0.5),
                 ('max_angular_vel', 2.0),
                 ('cmd_timeout_ms', 200),
+                ('reverse_motors', False),
                 ('odom_frame', 'odom'),
-                ('base_frame', 'base_link'),
+                ('base_frame', 'base_footprint'),
+                ('publish_odom_tf', True),
                 ('publish_rate', 50.0),
                 ('cmd_rate', 100.0),
             ]
@@ -137,13 +139,21 @@ class STM32BridgeNode(Node):
     # ============================================================
 
     def _cmd_callback(self, msg: Twist):
-        """接收 /cmd_vel 速度指令"""
+        """接收 /cmd_vel (遥控优先)"""
         max_lv = self.get_parameter('max_linear_vel').value
         max_av = self.get_parameter('max_angular_vel').value
+        reverse = self.get_parameter('reverse_motors').value
 
-        self._linear_x = max(-max_lv, min(max_lv, msg.linear.x))
-        self._angular_z = max(-max_av, min(max_av, msg.angular.z))
+        lx = msg.linear.x
+        az = msg.angular.z
+        if reverse:
+            lx = -lx
+            az = -az
+
+        self._linear_x = max(-max_lv, min(max_lv, lx))
+        self._angular_z = max(-max_av, min(max_av, az))
         self._last_cmd_time = self.get_clock().now()
+
 
     # ============================================================
     # 标定服务
@@ -291,15 +301,16 @@ class STM32BridgeNode(Node):
         odom_msg.pose.covariance[35] = 0.05  # yaw
         self.odom_pub.publish(odom_msg)
 
-        # ── TF (odom → base_link) ──
-        tf_msg = TransformStamped()
-        tf_msg.header.stamp = now
-        tf_msg.header.frame_id = self.get_parameter('odom_frame').value
-        tf_msg.child_frame_id = self.get_parameter('base_frame').value
-        tf_msg.transform.translation.x = self.odom_comp.x
-        tf_msg.transform.translation.y = self.odom_comp.y
-        tf_msg.transform.rotation = Quaternion(x=q[0], y=q[1], z=q[2], w=q[3])
-        self.tf_broadcaster.sendTransform(tf_msg)
+        # ── TF (odom → base_footprint), 激光里程计模式下可关闭 ──
+        if self.get_parameter('publish_odom_tf').value:
+            tf_msg = TransformStamped()
+            tf_msg.header.stamp = now
+            tf_msg.header.frame_id = self.get_parameter('odom_frame').value
+            tf_msg.child_frame_id = self.get_parameter('base_frame').value
+            tf_msg.transform.translation.x = self.odom_comp.x
+            tf_msg.transform.translation.y = self.odom_comp.y
+            tf_msg.transform.rotation = Quaternion(x=q[0], y=q[1], z=q[2], w=q[3])
+            self.tf_broadcaster.sendTransform(tf_msg)
 
         # ── IMU ──
         imu_msg = Imu()
