@@ -1,0 +1,22 @@
+robot_task_manager:
+  ros__parameters:
+    # 机器人身份
+    robot_name: "robot-01"
+
+    # 服务器
+    server_url: "39.105.113.176"
+
+    # 定时器间隔
+    heartbeat_interval: 5.0       # 心跳间隔（秒）
+    poll_interval: 3.0            # 任务轮询间隔（秒）
+    state_tick_rate: 5.0          # 状态机 tick 频率（Hz）
+
+    # 导航
+    nav_timeout: 120.0            # 单次导航超时（秒）
+    nav_retries: 2                # 导航失败重试次数
+
+    # 停靠站
+    docking_station: "1F-充电站"
+
+    # 位置映射文件（相对于 install 后 share 目录，或绝对路径）
+    locations_file: "locations.json"

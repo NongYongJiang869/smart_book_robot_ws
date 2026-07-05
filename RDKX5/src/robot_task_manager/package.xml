@@ -1,20 +1,18 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>stm32_bridge</name>
+  <name>robot_task_manager</name>
   <version>0.1.0</version>
-  <description>Serial bridge to STM32 chassis controller — publishes /odom, /imu, /chassis_status, /tf; subscribes /cmd_vel</description>
+  <description>Task manager with state machine for the library book-finding robot — polls server, accepts tasks, drives navigation and arm operations</description>
   <maintainer email="user@example.com">user</maintainer>
   <license>Apache-2.0</license>
 
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
   <depend>nav_msgs</depend>
-  <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
-  <depend>tf2_ros</depend>
-  <depend>custom_interfaces</depend>
   <depend>nav2_msgs</depend>
+  <depend>custom_interfaces</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
