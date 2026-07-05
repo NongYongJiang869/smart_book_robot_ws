@@ -26,6 +26,7 @@ setup(
     entry_points={
         'console_scripts': [
             'stm32_bridge_node = stm32_bridge.bridge_node:main',
+            'rotate_to_goal = stm32_bridge.rotate_to_goal:main',
         ],
     },
 )

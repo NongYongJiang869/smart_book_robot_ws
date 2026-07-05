@@ -75,6 +75,10 @@ def generate_launch_description():
              parameters=[os.path.join(stm32_dir, 'config', 'stm32_params.yaml'),
                         {'publish_odom_tf': False}]),
 
+        # ── 到位后原地旋转 ──
+        Node(package='stm32_bridge', executable='rotate_to_goal',
+             name='rotate_to_goal', output='screen'),
+
         # ── TF ──
         Node(package='tf2_ros', executable='static_transform_publisher',
              name='tf_footprint', output='screen',
