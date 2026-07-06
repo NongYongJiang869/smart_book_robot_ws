@@ -33,7 +33,7 @@ class RotateToGoal(Node):
         # params
         self.declare_parameter('xy_tolerance', 0.25)
         self.declare_parameter('yaw_tolerance', 0.087)
-        self.declare_parameter('angular_speed', 0.5)
+        self.declare_parameter('angular_speed', 1.0)
         self.declare_parameter('stuck_timeout', 5.0)        # 卡住不动多久放弃
         self.declare_parameter('goal_timeout', 300.0)       # 硬上限兜底
 
@@ -108,8 +108,8 @@ class RotateToGoal(Node):
         yaw_err = gyaw - self.curr_yaw
         yaw_err = math.atan2(math.sin(yaw_err), math.cos(yaw_err))
 
-        # 卡住检测 — 位置不动才是真卡住（不管距离有没有缩小）
-        if dist > self.xy_tol:
+        # 卡住检测 — 只在接近目标时检查（远处交给 Nav2 处理）
+        if dist < 2.0:
             moved = math.sqrt((self.curr_x - self.best_x)**2 + (self.curr_y - self.best_y)**2)
             if moved > 0.05:   # 位置变了 ≥ 5cm → 还在动
                 self.best_x = self.curr_x
@@ -117,10 +117,15 @@ class RotateToGoal(Node):
                 self.best_dist_time = self.get_clock().now()
             stuck_dt = (self.get_clock().now() - self.best_dist_time).nanoseconds * 1e-9
             if stuck_dt > self.stuck_timeout:
-                self.get_logger().warn(f'Not moving for {stuck_dt:.0f}s, giving up')
+                self.get_logger().warn(f'Not moving for {stuck_dt:.0f}s near goal, giving up')
                 self.goal = None
                 self._set_state('IDLE')
                 return
+        else:
+            # 远处：只要有目标就一直等 Nav2
+            self.best_x = self.curr_x
+            self.best_y = self.curr_y
+            self.best_dist_time = self.get_clock().now()
         # 硬超时兜底
         elapsed = (self.get_clock().now() - self.goal_time).nanoseconds * 1e-9
         if elapsed > self.goal_timeout:

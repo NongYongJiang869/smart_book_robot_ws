@@ -48,6 +48,10 @@ def generate_launch_description():
         Node(package='nav2_behaviors', executable='behavior_server', name='behavior_server',
              output='screen', parameters=[nav2_params]),
 
+        # ── Keepout Mask Publisher（禁区蒙版 + FilterInfo 一起发布） ──
+        Node(package='stm32_bridge', executable='keepout_mask_publisher',
+             name='keepout_mask_publisher', output='screen'),
+
         # ── Lifecycle Manager ──
         Node(package='nav2_lifecycle_manager', executable='lifecycle_manager',
              name='lifecycle_manager', output='screen',

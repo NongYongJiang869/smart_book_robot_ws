@@ -8,7 +8,7 @@ install/
 
 # Logs
 log/
-
+log.txt
 # IDE
 .vscode/
 .idea/

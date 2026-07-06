@@ -10,13 +10,18 @@
     ros2 run robot_task_manager task_manager_node --ros-args -p robot_name:=robot-01
 """
 
+import logging
 import os
 import time
+
+# 确保 Python logging 输出到控制台
+logging.basicConfig(level=logging.INFO, format='[%(name)s] %(message)s')
 
 import rclpy
 from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
 
+from .book_mapper import BookMapper
 from .library_api import LibraryAPI, ROBOT_IDLE
 from .location_mapper import LocationMapper
 from .robot_state_machine import RobotStateMachine, RobotState
@@ -43,6 +48,9 @@ class TaskManagerNode(Node):
                 ('nav_retries', 2),
                 ('docking_station', '1F-充电站'),
                 ('locations_file', 'locations.json'),
+                ('books_file', 'books.json'),
+                ('arm_mode', 'serial'),
+                ('arm_port', '/dev/ttyACM0'),
             ],
         )
 
@@ -73,19 +81,38 @@ class TaskManagerNode(Node):
         self.get_logger().info(f'📍 位置映射: {locations_path}')
         self.mapper = LocationMapper(locations_path)
 
-        # ── 3. 导航控制器 ──
+        # ── 3. 书籍映射 ──
+        books_file = self.get_parameter('books_file').value
+        if not os.path.isabs(books_file):
+            try:
+                pkg_share = get_package_share_directory('robot_task_manager')
+                books_path = os.path.join(pkg_share, 'config', books_file)
+            except Exception:
+                books_path = os.path.join(
+                    os.path.dirname(__file__), '..', 'config', books_file
+                )
+        else:
+            books_path = books_file
+
+        self.get_logger().info(f'📚 书籍映射: {books_path}')
+        self.book_mapper = BookMapper(books_path)
+
+        # ── 4. 导航控制器 ──
         nav_timeout = self.get_parameter('nav_timeout').value
         self.nav = NavigationController(self, timeout=nav_timeout)
 
-        # ── 4. 机械臂控制器 (模拟) ──
-        self.arm = ArmController(sim_delay=True, sim_duration=1.5)
+        # ── 5. 机械臂控制器 ──
+        arm_mode = self.get_parameter('arm_mode').value
+        arm_port = self.get_parameter('arm_port').value
+        self.arm = ArmController(mode=arm_mode, port=arm_port)
+        self.arm.book_mapper = self.book_mapper  # 注入书籍映射
 
-        # ── 5. 状态机 ──
+        # ── 6. 状态机 ──
         self.sm = RobotStateMachine(self.api, self.mapper, self.nav, self.arm)
         self.sm.set_docking(self.get_parameter('docking_station').value)
         self.sm.on_state_changed = self._on_state_changed
 
-        # ── 6. 定时器 ──
+        # ── 7. 定时器 ──
         hb_interval = self.get_parameter('heartbeat_interval').value
         self.hb_timer = self.create_timer(hb_interval, self._heartbeat_loop)
 

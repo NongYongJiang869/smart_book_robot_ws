@@ -1,4 +1,4 @@
-robot_task_manager:
+task_manager_node:
   ros__parameters:
     # 机器人身份
     robot_name: "robot-01"
@@ -20,3 +20,10 @@ robot_task_manager:
 
     # 位置映射文件（相对于 install 后 share 目录，或绝对路径）
     locations_file: "locations.json"
+
+    # 书籍映射文件
+    books_file: "books.json"
+
+    # 机械臂
+    arm_mode: "mock"               # "mock" 模拟 / "serial" 串口
+    arm_port: "/dev/ttyACM0"       # 串口设备路径

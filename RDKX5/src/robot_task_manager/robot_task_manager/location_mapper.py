@@ -21,6 +21,7 @@ JSON 文件格式 (locations.json):
 
 import json
 import logging
+import math
 import os
 from typing import Optional
 
@@ -70,7 +71,7 @@ class LocationMapper:
             section_data = self._data.get(section, {})
             if name in section_data:
                 coord = section_data[name]
-                return {"x": coord["x"], "y": coord["y"], "z": coord["z"]}
+                return self._to_coord(coord)
 
         logger.warning(f"位置 '{name}' 在 locations.json 中未找到")
         return None
@@ -100,14 +101,23 @@ class LocationMapper:
 
     # ── 辅助 ──────────────────────────────────────────
 
+    @staticmethod
+    def _to_coord(coord: dict) -> dict:
+        """将 JSON 中的坐标转为内部格式（yaw 从度转弧度，全部 cast 为 float）"""
+        return {
+            "x": float(coord["x"]),
+            "y": float(coord["y"]),
+            "z": float(coord["z"]),
+            "yaw": math.radians(float(coord.get("yaw", 0))),
+        }
+
     def _lookup_in(self, section: str, name: str) -> Optional[dict]:
         """在指定分组中查找"""
         if not name:
             return None
         section_data = self._data.get(section, {})
         if name in section_data:
-            coord = section_data[name]
-            return {"x": coord["x"], "y": coord["y"], "z": coord["z"]}
+            return self._to_coord(section_data[name])
         logger.warning(f"{section} 中未找到 '{name}'")
         return None
 

@@ -7,7 +7,7 @@
     use_sim_time: false
     global_frame: map
     robot_base_frame: base_footprint
-    odom_topic: /odom_fused
+    odom_topic: /odom_rf2o
     default_bt_xml_filename: "navigate_w_replanning_time.xml"
 
 /controller_server:
@@ -26,11 +26,11 @@
       max_vel_x: 0.1
       max_vel_y: 0.0
       min_vel_y: 0.0
-      max_vel_theta: 1.0
+      max_vel_theta: 1.5
       min_vel_theta: -1.0
       min_speed_xy: 0.06
       max_speed_xy: 0.1
-      min_speed_theta: 0.6
+      min_speed_theta: 0.7
       acc_lim_x: 0.2
       acc_lim_y: 0.0
       acc_lim_theta: 1.5
@@ -41,7 +41,7 @@
       xy_goal_tolerance: 0.2
       yaw_goal_tolerance: 6.28
       critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
-      BaseObstacle.scale: 0.02
+      BaseObstacle.scale: 2.0
       PathAlign.scale: 32.0
       PathDist.scale: 32.0
       GoalAlign.scale: 24.0
@@ -79,33 +79,28 @@
       publish_frequency: 0.5
       static_map: true
       rolling_window: false
-      width: 6
-      height: 6
       resolution: 0.05
+      robot_radius: 0.05
+      transform_tolerance: 0.5
       track_unknown_space: true
-      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
-      obstacle_layer:
-        plugin: "nav2_costmap_2d::ObstacleLayer"
-        enabled: true
-        observation_sources: scan
-        scan:
-          topic: /scan
-          max_obstacle_height: 2.0
-          clearing: true
-          marking: true
+      plugins: ["static_layer", "keepout_filter", "inflation_layer"]
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: true
+      keepout_filter:
+        plugin: "nav2_costmap_2d::KeepoutFilter"
+        enabled: true
+        filter_info_topic: "/costmap_filter_info"
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        inflation_radius: 0.3
-        cost_scaling_factor: 3.0
+        inflation_radius: 0.08
+        cost_scaling_factor: 5.0
 
 /local_costmap:
   local_costmap:
     ros__parameters:
       use_sim_time: false
-      global_frame: map
+      global_frame: odom_laser
       robot_base_frame: base_footprint
       update_frequency: 5.0
       publish_frequency: 2.0
@@ -114,6 +109,8 @@
       width: 4
       height: 4
       resolution: 0.05
+      robot_radius: 0.05
+      transform_tolerance: 0.5
       plugins: ["obstacle_layer", "inflation_layer"]
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
@@ -124,14 +121,27 @@
           max_obstacle_height: 2.0
           clearing: true
           marking: true
+          observation_persistence: 2.0
+          expected_update_rate: 0.5
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        inflation_radius: 0.3
-        cost_scaling_factor: 3.0
+        inflation_radius: 0.08
+        cost_scaling_factor: 5.0
 
 /behavior_server:
   ros__parameters:
     use_sim_time: false
+    local_frame: odom_laser
+    robot_base_frame: base_footprint
+    transform_tolerance: 0.5
+    backup:
+      local_frame: odom_laser
+    spin:
+      local_frame: odom_laser
+    drive_on_heading:
+      local_frame: odom_laser
+    wait:
+      local_frame: odom_laser
 
 /waypoint_follower:
   ros__parameters:

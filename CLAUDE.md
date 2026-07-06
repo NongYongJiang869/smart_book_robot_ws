@@ -179,3 +179,74 @@ Fine alignment uses P-controller on OpenMV detection results:
 - `SerialEvent()`-driven command parsing: character `$` → command mode, `#` → servo control mode, `{` → action group execution, `<` → action group download
 - IK solver (`kinematics_analysis`) does geometric inverse kinematics: given (x,y,z,Alpha) → computes joint angles θ3-θ6 → converts to PWM via linear mapping.
 - The `kinematics_move()` function brute-force searches Alpha from 0° down to -135° to find a valid solution, then executes via `set_servo()`.
+
+## Keepout Zones（禁区蒙版）
+
+Robot can be restricted from certain areas WITHOUT modifying the SLAM map (so AMCL localization is unaffected).
+
+**Architecture**: Keepout mask PGM → `keepout_mask_publisher` → `/keepout_mask` + `/costmap_filter_info` → `KeepoutFilter` in global costmap → path planning avoids zones.
+
+**Files**:
+- `/root/library_keepout_mask.pgm` — keepout mask (800×800, same dimensions as map)
+- `/root/library_keepout_mask.yaml` — mask config (mode: scale, resolution: 0.05, origin: [-20, -20])
+- `RDKX5/src/stm32_bridge/stm32_bridge/keepout_mask_publisher.py` — publishes mask + CostmapFilterInfo
+- `RDKX5/src/stm32_bridge/config/nav2_params.yaml` — global costmap has `keepout_filter` plugin
+- `tools/map_editor_gui.py` — GUI editor (draw = left-drag, clear = right-drag, save = Ctrl+S)
+- `tools/edit_map.py` — CLI editor (`--add-keepout-rect`, `--clear-keepout-rect`, `--show-keepout`)
+
+**Key details**:
+- `keepout_mask_publisher` publishes only at startup and on file change (not at fixed rate, to avoid flooding KeepoutFilter with "new" messages)
+- KeepoutFilter needs BOTH `CostmapFilterInfo` (on `/costmap_filter_info`) and mask `OccupancyGrid` (on `/keepout_mask`)
+- The publisher uses `np.flipud` before flattening — y-axis must be flipped for OccupancyGrid alignment
+- PGM pixel 0 (black) = keepout active, 254 (white) = free
+- Do NOT use `costmap_filter_info_server` (C++ lifecycle node) — it fails to configure. Our Python node handles both publications.
+
+## Navigation Goals
+
+**Send navigation goals via BOTH `NavigateToPose` action AND `/goal_pose` topic:**
+- `NavigateToPose` action → drives Nav2 path planning + controller (bt_navigator)
+- `/goal_pose` topic → triggers `rotate_to_goal` node for final yaw alignment
+- `rotate_to_goal` watches Nav2 reach xy position, then takes over `/cmd_vel` for pure rotation
+- **MUST send BOTH**, otherwise robot reaches position but doesn't rotate to target yaw
+```python
+# NavigateToPose action (drives navigation)
+ac = ActionClient(node, NavigateToPose, 'navigate_to_pose')
+goal = NavigateToPose.Goal()
+goal.pose.header.frame_id = 'map'
+goal.pose.header.stamp = node.get_clock().now().to_msg()
+# ... set position and orientation ...
+ac.send_goal_async(goal)
+
+# /goal_pose topic (triggers rotate_to_goal for final rotation)
+pub = node.create_publisher(PoseStamped, '/goal_pose', 10)
+pg = PoseStamped()
+pg.header.frame_id = 'map'
+pg.header.stamp = node.get_clock().now().to_msg()
+pg.pose = goal.pose.pose
+pub.publish(pg)
+```
+
+`rotate_to_goal` params: `xy_tolerance=0.25m`, `yaw_tolerance=0.087rad(5°)`, `stuck_timeout=5s`.
+
+## Task Manager / Locations
+
+**Location config**: `RDKX5/src/robot_task_manager/config/locations.json`
+- `docking_stations` — robot charging/docking locations
+- `bookshelves` — bookshelf positions
+- `seats` — seat/table positions
+- Fields: `x, y, z` (meters, z = height), `yaw` (degrees, 0=+x东, 90=+y北)
+
+**Book mapping**: `RDKX5/src/robot_task_manager/config/books.json`
+
+**Launch**:
+```bash
+ros2 launch robot_task_manager task_manager.launch.py use_rviz:=true robot_name:=robot-01
+```
+
+## RViz Config
+
+Default RViz config at `RDKX5/src/stm32_bridge/config/map_view.rviz` includes:
+- Map (/map), LaserScan (/scan), Odometry (/odom_fused), TF
+- **Global Costmap** — `/global_costmap/costmap` (shows keepout zones in purple)
+- **Local Costmap** — `/local_costmap/costmap`
+- "2D Goal Pose" tool publishes to `/goal_pose`

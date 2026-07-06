@@ -107,7 +107,7 @@ class RobotStateMachine:
         self.docking_coord = self.mapper.get_docking(station_name)
         if self.docking_coord is None:
             logger.warning(f"停靠站 '{station_name}' 坐标未找到，使用 (0,0,0)")
-            self.docking_coord = {"x": 0.0, "y": 0.0, "z": 0.0}
+            self.docking_coord = {"x": 0.0, "y": 0.0, "z": 0.0, "yaw": 0.0}
 
     def assign_task(self, task: dict):
         """分配新任务（由 ROS 节点在发现 pending 任务时调用）"""
@@ -212,7 +212,8 @@ class RobotStateMachine:
             logger.info(f"开始导航到书架: {location} → ({coord['x']:.1f}, {coord['y']:.1f}, z={coord['z']})")
             self._update_server_status(STATUS_SEARCHING, location)
             self._nav_retries = 0
-            self.nav.navigate_to(coord["x"], coord["y"], coord["z"])
+            self.nav.navigate_to(coord["x"], coord["y"], coord["z"],
+                                 coord.get("yaw", 0.0))
 
         # 检查导航状态
         status = self.nav.get_status()
@@ -226,7 +227,8 @@ class RobotStateMachine:
                 coord = self.mapper.get_bookshelf(
                     self.current_task.get("book_location", ""))
                 if coord:
-                    self.nav.navigate_to(coord["x"], coord["y"], coord["z"])
+                    self.nav.navigate_to(coord["x"], coord["y"], coord["z"],
+                                 coord.get("yaw", 0.0))
             else:
                 self.error_reason = "导航到书架失败（已达最大重试次数）"
                 self._transition_to(RobotState.ERROR)
@@ -293,7 +295,8 @@ class RobotStateMachine:
             logger.info(f"开始运送至座位: {table_num} → ({coord['x']:.1f}, {coord['y']:.1f}, z={coord['z']})")
             self._update_server_status(STATUS_DELIVERING, table_num)
             self._nav_retries = 0
-            self.nav.navigate_to(coord["x"], coord["y"], coord["z"])
+            self.nav.navigate_to(coord["x"], coord["y"], coord["z"],
+                                 coord.get("yaw", 0.0))
 
         status = self.nav.get_status()
         if status == "succeeded":
@@ -306,23 +309,44 @@ class RobotStateMachine:
                 coord = self.mapper.get_seat(
                     self.current_task.get("target_table", ""))
                 if coord:
-                    self.nav.navigate_to(coord["x"], coord["y"], coord["z"])
+                    self.nav.navigate_to(coord["x"], coord["y"], coord["z"],
+                                 coord.get("yaw", 0.0))
             else:
                 self.error_reason = "导航到座位失败（已达最大重试次数）"
                 self._transition_to(RobotState.ERROR)
 
     # ── DELIVERED ──
     def _handle_delivered(self):
-        """已送达"""
+        """已送达 — 放书 → 停稳 → 返回"""
         if self._first_tick:
             order_id = self.current_task.get("id", 0)
             table_num = self.current_task.get("target_table", "")
             self._update_server_status(STATUS_DELIVERED, table_num)
             logger.info(f"📦 任务 #{order_id} 已送达!")
-            # 模拟耗电
             self.battery = max(10, self.battery - self._estimate_consumption())
+            # 触发放书
+            self.arm.place()
+            logger.info("🦾 正在放书...")
+            self._arm_done = False  # 标记放书是否完成
 
-        # 自动转移到返回
+        # 先等机械臂放书完成
+        if not getattr(self, '_arm_done', False):
+            arm_status = self.arm.get_status()
+            if arm_status == "active":
+                return  # 还在放书中
+            if arm_status == "failed":
+                self.error_reason = "放书失败"
+                self._transition_to(RobotState.ERROR)
+                return
+            # 放书完成，记录时间
+            self._arm_done = True
+            self._arm_done_time = time.time()
+            logger.info("✅ 放书完成，停稳 2 秒...")
+            return
+
+        # 放书完成后停稳 2 秒
+        if time.time() - self._arm_done_time < 2.0:
+            return
         self._transition_to(RobotState.RETURNING)
 
     # ── RETURNING ──
@@ -338,6 +362,7 @@ class RobotStateMachine:
                 self.docking_coord["x"],
                 self.docking_coord["y"],
                 self.docking_coord["z"],
+                self.docking_coord.get("yaw", 0.0),
             )
 
         status = self.nav.get_status()

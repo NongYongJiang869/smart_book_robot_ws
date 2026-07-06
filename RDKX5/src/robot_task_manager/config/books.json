@@ -1,0 +1,10 @@
+{
+  "_说明": "书籍编号映射表。book_number 对应书架上的物理位置，机械臂根据编号取书。",
+
+  "books": {
+    "Minimalist Forms":   { "book_number": 1 },
+    "Silent Spaces":      { "book_number": 2 },
+    "The Art of Design":  { "book_number": 3 },
+    "Typography Now":     { "book_number": 4 }
+  }
+}
