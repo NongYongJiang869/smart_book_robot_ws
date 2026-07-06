@@ -317,37 +317,46 @@ class RobotStateMachine:
 
     # ── DELIVERED ──
     def _handle_delivered(self):
-        """已送达 — 放书 → 停稳 → 返回"""
+        """
+        已送达座位：
+          1. 等 rotate_to_goal 转正方向 + 停稳 (3s)
+          2. 发送放书指令，等机械臂返回 "6"
+          3. 返回充电站
+        """
         if self._first_tick:
             order_id = self.current_task.get("id", 0)
             table_num = self.current_task.get("target_table", "")
             self._update_server_status(STATUS_DELIVERED, table_num)
             logger.info(f"📦 任务 #{order_id} 已送达!")
             self.battery = max(10, self.battery - self._estimate_consumption())
+            self._phase = 'stabilize'  # 阶段：stabilize → placing → done
+
+        # 阶段 1: 等旋转完成 + 停稳 3 秒
+        if self._phase == 'stabilize':
+            if self.elapsed_in_state < 3.0:
+                return
             # 触发放书
             self.arm.place()
-            logger.info("🦾 正在放书...")
-            self._arm_done = False  # 标记放书是否完成
+            logger.info("🦾 发送放书指令...")
+            self._phase = 'placing'
+            return
 
-        # 先等机械臂放书完成
-        if not getattr(self, '_arm_done', False):
+        # 阶段 2: 等机械臂放书完成（收到 "6"）
+        if self._phase == 'placing':
             arm_status = self.arm.get_status()
             if arm_status == "active":
-                return  # 还在放书中
+                return
             if arm_status == "failed":
                 self.error_reason = "放书失败"
                 self._transition_to(RobotState.ERROR)
                 return
-            # 放书完成，记录时间
-            self._arm_done = True
-            self._arm_done_time = time.time()
-            logger.info("✅ 放书完成，停稳 2 秒...")
+            logger.info("✅ 放书完成")
+            self._phase = 'done'
             return
 
-        # 放书完成后停稳 2 秒
-        if time.time() - self._arm_done_time < 2.0:
-            return
-        self._transition_to(RobotState.RETURNING)
+        # 阶段 3: 返回
+        if self._phase == 'done':
+            self._transition_to(RobotState.RETURNING)
 
     # ── RETURNING ──
     def _handle_returning(self):

@@ -25,5 +25,5 @@ task_manager_node:
     books_file: "books.json"
 
     # 机械臂
-    arm_mode: "mock"               # "mock" 模拟 / "serial" 串口
+    arm_mode: "serial"             # "mock" 模拟 / "serial" 串口
     arm_port: "/dev/ttyACM0"       # 串口设备路径
