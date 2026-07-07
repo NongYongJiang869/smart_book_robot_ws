@@ -50,6 +50,10 @@ class NavigationController:
         self._best_dist = float('inf') # 历史最近距离
         self._best_dist_time = 0.0     # 达到最近距离的时间
 
+        # 途经点队列
+        self._waypoints: list = []     # 途经点坐标列表
+        self._wp_index = 0            # 当前途经点下标
+
         logger.info("NavigationController: 使用 /goal_pose topic（同 RViz）")
 
     # ── 公共接口 ──────────────────────────────────────
@@ -58,6 +62,8 @@ class NavigationController:
                     yaw: float = 0.0, frame: str = "map"):
         """发送导航目标到 /goal_pose（非阻塞）"""
         self._target = {"x": x, "y": y}
+        self._waypoints = []   # 清除途经点（直接导航模式）
+        self._wp_index = 0
 
         goal = PoseStamped()
         goal.header.frame_id = frame
@@ -78,6 +84,34 @@ class NavigationController:
         self._best_dist = float('inf')
         self._best_dist_time = time.time()
         logger.info(f"导航目标已发布: ({x:.2f}, {y:.2f}) yaw={yaw:.2f}")
+
+    def navigate_waypoints(self, waypoints: list):
+        """
+        发送途经点序列，逐个导航。
+
+        Args:
+            waypoints: [{"x":..., "y":..., "z":..., "yaw":...}, ...]
+                       至少包含一个点，最后一个点是最终目标
+        """
+        if not waypoints:
+            logger.warning("navigate_waypoints: 途经点列表为空")
+            return
+
+        self._waypoints = list(waypoints)
+        self._wp_index = 0
+        logger.info(f"途经点导航: 共 {len(self._waypoints)} 个点")
+        self._send_current_waypoint()
+
+    def _send_current_waypoint(self):
+        """发送当前途经点"""
+        wp = self._waypoints[self._wp_index]
+        total = len(self._waypoints)
+        logger.info(f"途经点 [{self._wp_index + 1}/{total}]: ({wp['x']:.2f}, {wp['y']:.2f})")
+        self.navigate_to(
+            wp["x"], wp["y"],
+            wp.get("z", 0.0),
+            wp.get("yaw", 0.0),
+        )
 
     def get_status(self) -> str:
         """
@@ -118,20 +152,33 @@ class NavigationController:
                 )
 
             if dist < self._goal_tolerance:
-                self._status = "succeeded"
-                logger.info(f"✅ 到达目标 (距离 {dist:.3f}m < {self._goal_tolerance}m)")
+                self._on_waypoint_reached(dist, now)
             elif settling and close_enough:
-                self._status = "succeeded"
-                logger.info(
-                    f"✅ 接受当前位置 (距离 {dist:.3f}m, "
-                    f"已稳定 {now - self._best_dist_time:.0f}s")
+                self._on_waypoint_reached(dist, now)
 
         return self._status
 
+    def _on_waypoint_reached(self, dist: float, now: float):
+        """当前途经点到达后的处理：推进到下一个或标记成功"""
+        if self._waypoints and self._wp_index + 1 < len(self._waypoints):
+            # 还有更多途经点 → 推进
+            self._wp_index += 1
+            logger.info(
+                f"✅ 途经点到达 (距离 {dist:.3f}m), "
+                f"推进到 [{self._wp_index + 1}/{len(self._waypoints)}]"
+            )
+            self._send_current_waypoint()
+            # _send_current_waypoint → navigate_to 已将 status 重置为 "active"
+        else:
+            self._status = "succeeded"
+            logger.info(f"✅ 到达最终目标 (距离 {dist:.3f}m)")
+
     def cancel(self):
-        """取消导航（发布同一位姿让 Nav2 停止规划）"""
+        """取消导航"""
         self._status = "idle"
         self._target = None
+        self._waypoints = []
+        self._wp_index = 0
 
     @property
     def target(self) -> Optional[dict]:

@@ -10,11 +10,6 @@ typedef struct {
 	int servo_pwm[6];		//0号到4号舵机的角度
 }kinematics_t;
 kinematics_t kinematics;
-//=== 状态查询用全局变量 ===
-float last_kms_x = 0, last_kms_y = 0, last_kms_z = 0;
-int   last_kms_alpha = 0;
-int   kms_result = 0;      // 0=未执行过 1=成功 -1=失败
-//==========================
 void setup_kinematics(float L0, float L1, float L2, float L3, kinematics_t *kinematics) {
 	//放大10倍
 	kinematics->L0 = L0*10;
@@ -117,22 +112,9 @@ int kinematics_move(float x, float y, float z, int mtime) {
 		for(j=0;j<4;j++) {
 			set_servo(j, kinematics.servo_pwm[j], mtime);
 		}
-		//=== 记录状态 + 发送回执 ===
-		last_kms_x = x; last_kms_y = y; last_kms_z = z;
-		last_kms_alpha = mmin;
-		kms_result = 1;
-		Serial.print("@KMS_OK,");
-		Serial.print(mmin);
-		Serial.println("!");
-		//==========================
 		return 1;
 	}
 
-	//=== 记录失败 ===
-	last_kms_x = x; last_kms_y = y; last_kms_z = z;
-	kms_result = -1;
-	Serial.println("@KMS_ERR!");
-	//=================
 	return 0;
 }
 
@@ -585,40 +567,6 @@ void parse_cmd(u8 *uart_receive_buf) {
 				Serial.println("Can not find best pos!!!");
 			}
 		}
-	}
-	//=== 状态查询 ===
-	else if(pos = str_contain_str((char *)uart_receive_buf, "$QSTAT!"), pos) {
-		int busy = 0;
-		for(int i=0;i<SERVO_NUM;i++) {
-			if(abs(servo_do[i].inc) > 0.01) { busy = 1; break; }
-		}
-		if(group_do_ok == 0) busy = 1;
-		int err_code = 0;
-		if(kms_result == -1) err_code = 1;
-		if(busy) {
-			Serial.print("@STATUS:BUSY,x=");
-		} else if(err_code) {
-			Serial.print("@STATUS:ERROR,x=");
-		} else {
-			Serial.print("@STATUS:IDLE,x=");
-		}
-		Serial.print((int)last_kms_x);
-		Serial.print(",y=");
-		Serial.print((int)last_kms_y);
-		Serial.print(",z=");
-		Serial.print((int)last_kms_z);
-		Serial.print(",alpha=");
-		Serial.print(last_kms_alpha);
-		Serial.println("!");
-	}
-	//=== PWM 查询 ===
-	else if(pos = str_contain_str((char *)uart_receive_buf, "$QPWM!"), pos) {
-		Serial.print("@PWM:");
-		for(int i=0;i<SERVO_NUM;i++) {
-			Serial.print((int)servo_do[i].cur);
-			if(i < SERVO_NUM-1) Serial.print(",");
-		}
-		Serial.println("!");
 	}
 	else {
     }

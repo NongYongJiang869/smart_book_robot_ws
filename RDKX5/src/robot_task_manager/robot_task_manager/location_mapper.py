@@ -121,6 +121,51 @@ class LocationMapper:
         logger.warning(f"{section} 中未找到 '{name}'")
         return None
 
+    def get_waypoint(self, name: str) -> Optional[dict]:
+        """查找途经点坐标"""
+        return self._lookup_in("waypoints", name)
+
+    def find_path(self, from_location: str, to_location: str) -> Optional[list]:
+        """
+        查找从 from 到 to 的导航路径，返回坐标列表。
+
+        匹配策略:
+          1. 精确匹配 path key: "from→to"
+          2. 遍历所有 path，检查 key 是否同时包含 from 和 to
+
+        Returns:
+            [{"x":..., "y":..., "z":..., "yaw":...}, ...] or None
+        """
+        paths = self._data.get("paths", {})
+        if not paths:
+            return None
+
+        # 精确匹配
+        exact_key = f"{from_location}→{to_location}"
+        path_names = paths.get(exact_key)
+
+        # 模糊匹配
+        if path_names is None:
+            for key, names in paths.items():
+                if from_location in key and to_location in key:
+                    path_names = names
+                    break
+
+        if path_names is None:
+            return None
+
+        # 将名称列表解析为坐标列表
+        coords = []
+        for name in path_names:
+            coord = self.lookup(name)
+            if coord is None:
+                logger.warning(f"路径中的点 '{name}' 未在 locations.json 中找到")
+                return None
+            coords.append(coord)
+
+        logger.info(f"找到路径 {exact_key}: {len(coords)} 个途经点")
+        return coords
+
     def get_all_in_section(self, section: str) -> dict:
         """返回指定分组的全部数据（用于调试/列表展示）"""
         return self._data.get(section, {})

@@ -4,11 +4,12 @@
 
 与 6 轴机械臂 Arduino 固件通信（/dev/ttyACM0, 115200）
 
-协议（来自 tools/robotic_arm.py）:
-  发 "1\n"  → 取书 #1，机械臂自动完成: 展开 → 定位 → 夹取
-  发 "2\n"  → 取书 #2
+协议:
+  发 "1\\n"  → 取书 #1，机械臂自动完成: 展开 → 定位 → 夹取
+  发 "2\\n"  → 取书 #2
+  收到 "9"  → 机械臂已收到指令 (ACK)
   收到 "0"  → 夹取完成
-  发 "3\n"  → 放书
+  发 "3\\n"  → 放书
   收到 "6"  → 放书完成
 
 用法:
@@ -27,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_PORT = "/dev/ttyACM0"
 DEFAULT_BAUD = 115200
-GRASP_TIMEOUT = 90.0   # 夹取超时（秒）
+GRASP_TIMEOUT = 180.0   # 夹取超时（秒）
 PLACE_TIMEOUT = 90.0   # 放书超时（秒）
 
 
@@ -50,6 +51,7 @@ class ArmController:
         self._action = ""
         self._start_time = 0.0
         self._book_number: Optional[int] = None
+        self._ack_received = False  # 是否收到机械臂 ACK ("9")
 
         # 串口
         self._ser = None
@@ -166,9 +168,10 @@ class ArmController:
         self._action = name
         self._start_time = time.time()
         self._status = "active"
+        self._ack_received = False
 
     def _read_serial(self):
-        """读取串口数据，检查 '0'（夹取完成）或 '6'（放书完成）"""
+        """读取串口数据，检查 '9' (ACK)、'0' (夹取完成)、'6' (放书完成)"""
         if not self._ser or not self._ser.is_open:
             return
         try:
@@ -178,7 +181,10 @@ class ArmController:
                 ).strip()
                 if data:
                     logger.info(f"📨 机械臂响应: '{data}'")
-                    if "6" in data:
+                    if "9" in data:
+                        self._ack_received = True
+                        logger.info("📨 机械臂 ACK: 指令已收到")
+                    elif "6" in data:
                         self._status = "succeeded"
                         logger.info("✅ 放书完成 (收到 '6')")
                     elif "0" in data:

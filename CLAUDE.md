@@ -18,15 +18,8 @@ smart_book_robot_ws/
 │   └── src/
 │       ├── custom_interfaces/  # 自定义消息 (ChassisStatus, RobotStatus)
 │       └── stm32_bridge/       # STM32 串口桥接 (serial_protocol, odometry, bridge_node)
-├── design_docs/               # 设计文档 — 权威架构参考
-│   ├── 01_project_overview.md
-│   ├── 02_hardware_architecture.md
-│   ├── 03_communication_protocols.md
-│   ├── 04_ros2_interfaces.md
-│   ├── 05_software_modules.md
-│   ├── 06_tf_coordinate_tree.md
-│   ├── 07_execution_plan.md
-│   └── 08_rdk_x5_gpio_peripherals.md
+|
+|
 ├── chassis/                   # STM32F103C8T6 firmware — chassis motor control
 │   ├── inc/                  # Headers (motor.h, encoder.h, bsp_usart.h, etc.)
 │   ├── src/                  # Sources (main.c, motor.c, encoder.c, bsp_usart.c, etc.)

@@ -200,7 +200,7 @@ class RobotStateMachine:
 
     # ── NAV_TO_SHELF ──
     def _handle_nav_to_shelf(self):
-        """导航到书架"""
+        """导航到书架（优先使用预定义路径途经点）"""
         if self._first_tick:
             # 查找书架坐标
             location = self.current_task.get("book_location", "")
@@ -209,11 +209,19 @@ class RobotStateMachine:
                 self.error_reason = f"书架坐标未找到: '{location}'"
                 self._transition_to(RobotState.ERROR)
                 return
-            logger.info(f"开始导航到书架: {location} → ({coord['x']:.1f}, {coord['y']:.1f}, z={coord['z']})")
+
             self._update_server_status(STATUS_SEARCHING, location)
             self._nav_retries = 0
-            self.nav.navigate_to(coord["x"], coord["y"], coord["z"],
-                                 coord.get("yaw", 0.0))
+
+            # 尝试查找预定义路径（途经点序列）
+            path = self.mapper.find_path(self.docking_station, location)
+            if path:
+                logger.info(f"开始导航到书架 (途经 {len(path)} 个点): {location}")
+                self.nav.navigate_waypoints(path)
+            else:
+                logger.info(f"开始导航到书架 (直达): {location} → ({coord['x']:.1f}, {coord['y']:.1f})")
+                self.nav.navigate_to(coord["x"], coord["y"], coord["z"],
+                                     coord.get("yaw", 0.0))
 
         # 检查导航状态
         status = self.nav.get_status()
@@ -223,7 +231,7 @@ class RobotStateMachine:
         elif status == "failed":
             self._nav_retries += 1
             if self._nav_retries <= self._max_nav_retries:
-                logger.warning(f"导航到书架失败，重试 {self._nav_retries}/{self._max_nav_retries}")
+                logger.warning(f"导航到书架失败，重试 {self._nav_retries}/{self._max_nav_retries} (直达模式)")
                 coord = self.mapper.get_bookshelf(
                     self.current_task.get("book_location", ""))
                 if coord:
@@ -360,19 +368,31 @@ class RobotStateMachine:
 
     # ── RETURNING ──
     def _handle_returning(self):
-        """返回停靠站"""
+        """返回停靠站（优先使用预定义路径）"""
         if self._first_tick:
             if self.docking_coord is None:
                 self.set_docking(self.docking_station)
-            logger.info(f"返回停靠站: {self.docking_station} → "
-                        f"({self.docking_coord['x']:.1f}, {self.docking_coord['y']:.1f})")
+
             self._nav_retries = 0
-            self.nav.navigate_to(
-                self.docking_coord["x"],
-                self.docking_coord["y"],
-                self.docking_coord["z"],
-                self.docking_coord.get("yaw", 0.0),
-            )
+
+            # 尝试查找返回路径（从书架或座位到充电站）
+            book_location = self.current_task.get("book_location", "")
+            table_num = self.current_task.get("target_table", "")
+            path = (self.mapper.find_path(book_location, self.docking_station) or
+                    self.mapper.find_path(table_num, self.docking_station))
+
+            if path:
+                logger.info(f"返回停靠站 (途经 {len(path)} 个点): {self.docking_station}")
+                self.nav.navigate_waypoints(path)
+            else:
+                logger.info(f"返回停靠站 (直达): {self.docking_station} → "
+                            f"({self.docking_coord['x']:.1f}, {self.docking_coord['y']:.1f})")
+                self.nav.navigate_to(
+                    self.docking_coord["x"],
+                    self.docking_coord["y"],
+                    self.docking_coord["z"],
+                    self.docking_coord.get("yaw", 0.0),
+                )
 
         status = self.nav.get_status()
         if status == "succeeded":
@@ -382,12 +402,13 @@ class RobotStateMachine:
         elif status == "failed":
             self._nav_retries += 1
             if self._nav_retries <= self._max_nav_retries:
-                logger.warning(f"返回停靠站失败，重试 {self._nav_retries}/{self._max_nav_retries}")
+                logger.warning(f"返回停靠站失败，重试 {self._nav_retries}/{self._max_nav_retries} (直达模式)")
                 if self.docking_coord:
                     self.nav.navigate_to(
                         self.docking_coord["x"],
                         self.docking_coord["y"],
                         self.docking_coord["z"],
+                        self.docking_coord.get("yaw", 0.0),
                     )
             else:
                 self.error_reason = "返回停靠站失败（已达最大重试次数）"
